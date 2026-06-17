@@ -1,40 +1,47 @@
-import { formatNumber } from '../../utils/formatters';
-import { getPriorityInfo } from '../../utils/formatters';
+import { formatNumber, getPriorityInfo } from '../../utils/formatters';
+import Icon from '../ui/Icons';
 
-const categoryIcons = {
-  transport: '🚗',
-  energy: '⚡',
-  food: '🍽️',
-  shopping: '🛍️',
+const CATEGORY_ICON_MAP = {
+  transport: 'transport',
+  energy: 'energy',
+  food: 'food',
+  shopping: 'shopping',
 };
 
 export default function RecommendationCard({ recommendation, index }) {
   const priorityInfo = getPriorityInfo(recommendation.priority);
+  const iconName = CATEGORY_ICON_MAP[recommendation.category] || 'info';
+
+  const priorityBg = recommendation.priority === 'HIGH'
+    ? 'rgba(244,63,94,0.12)'
+    : recommendation.priority === 'MEDIUM'
+    ? 'rgba(245,158,11,0.12)'
+    : 'rgba(79,142,247,0.12)';
+
+  const priorityColor = recommendation.priority === 'HIGH'
+    ? '#fb7185'
+    : recommendation.priority === 'MEDIUM'
+    ? '#fbbf24'
+    : '#7aadfa';
 
   return (
     <div
       className="glass-card-hover p-5 animate-slide-up"
-      style={{ animationDelay: `${index * 0.08}s` }}
+      style={{ animationDelay: `${index * 0.06}s` }}
     >
       <div className="flex items-start gap-4">
         {/* Category icon */}
         <div
-          className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
-          style={{
-            background: recommendation.priority === 'HIGH'
-              ? 'rgba(239,68,68,0.15)'
-              : recommendation.priority === 'MEDIUM'
-              ? 'rgba(245,158,11,0.15)'
-              : 'rgba(6,182,212,0.15)',
-          }}
+          className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+          style={{ background: priorityBg }}
           aria-hidden="true"
         >
-          {categoryIcons[recommendation.category] || '💡'}
+          <Icon name={iconName} size={18} style={{ color: priorityColor }} className="text-current" />
         </div>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-3 mb-2">
-            <h4 className="text-slate-200 font-semibold text-sm leading-snug">
+            <h4 className="text-sm font-semibold leading-snug" style={{ color: 'var(--color-text)' }}>
               {recommendation.title}
             </h4>
             <span
@@ -48,15 +55,17 @@ export default function RecommendationCard({ recommendation, index }) {
             </span>
           </div>
 
-          <p className="text-slate-500 text-xs leading-relaxed mb-3">
+          <p className="text-xs leading-relaxed mb-3" style={{ color: 'var(--color-text-muted)' }}>
             {recommendation.description}
           </p>
 
           <div className="flex items-center gap-2">
-            <span className="text-emerald-400 font-mono font-semibold text-sm">
+            <span className="font-mono font-semibold text-sm" style={{ color: '#00C27B' }}>
               −{formatNumber(recommendation.estimatedSavings)} kg
             </span>
-            <span className="text-slate-600 text-xs">CO₂ savings/year</span>
+            <span className="text-xs" style={{ color: 'var(--color-text-faint)' }}>
+              CO₂ savings/year
+            </span>
           </div>
         </div>
       </div>

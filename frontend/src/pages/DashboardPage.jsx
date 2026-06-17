@@ -10,7 +10,6 @@ import RecommendationCard from '../components/dashboard/RecommendationCard';
 import { PageLoader } from '../components/ui/LoadingSpinner';
 import Button from '../components/ui/Button';
 import { formatDate, getScoreInfo } from '../utils/formatters';
-import Icon from '../components/ui/Icons';
 
 export default function DashboardPage() {
   const { assessmentId } = useParams();
@@ -36,19 +35,11 @@ export default function DashboardPage() {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-4">
         <div className="text-center">
-          <div
-            className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5"
-            style={{ background: 'rgba(244,63,94,0.1)', color: '#f43f5e' }}
-          >
-            <Icon name="info" size={28} />
-          </div>
-          <h2
-            className="text-2xl font-bold mb-2"
-            style={{ fontFamily: 'Syne, sans-serif', color: 'var(--color-text)' }}
-          >
+          <p className="text-xs font-mono mb-4" style={{ color: '#444', letterSpacing: '0.1em' }}>ERROR</p>
+          <h2 className="text-2xl font-bold mb-2" style={{ fontFamily: 'Syne, sans-serif' }}>
             Assessment Not Found
           </h2>
-          <p className="mb-6" style={{ color: 'var(--color-text-muted)' }}>{error}</p>
+          <p className="mb-6" style={{ color: '#555' }}>{error}</p>
           <Link to="/calculator"><Button>New Assessment</Button></Link>
         </div>
       </div>
@@ -66,32 +57,20 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <div className="eco-badge inline-flex mb-3">
-              <Icon name="chart" size={13} />
-              Dashboard
-            </div>
-            <h1
-              className="text-3xl font-bold"
-              style={{ fontFamily: 'Syne, sans-serif', color: 'var(--color-text)' }}
-            >
+            <div className="eco-badge inline-flex mb-3">Dashboard</div>
+            <h1 className="text-3xl font-bold" style={{ fontFamily: 'Syne, sans-serif' }}>
               Your Carbon Footprint
             </h1>
-            <p className="text-sm mt-1.5" style={{ color: 'var(--color-text-faint)' }}>
+            <p className="text-sm mt-1.5" style={{ color: '#444' }}>
               Assessment from {formatDate(assessment.createdAt)}
             </p>
           </div>
           <div className="flex gap-3 flex-wrap">
             <Link to={`/simulator/${assessmentId}`}>
-              <Button variant="secondary" id="btn-simulate">
-                <Icon name="flask" size={15} />
-                Simulate Changes
-              </Button>
+              <Button variant="secondary" id="btn-simulate">Simulate Changes</Button>
             </Link>
             <Link to="/calculator">
-              <Button id="btn-new-assessment">
-                <Icon name="plus" size={15} className="text-white" />
-                New Assessment
-              </Button>
+              <Button id="btn-new-assessment">New Assessment</Button>
             </Link>
           </div>
         </div>
@@ -99,24 +78,25 @@ export default function DashboardPage() {
         {/* Score banner */}
         <div
           className="glass-card p-5 mb-6 flex items-center gap-4 animate-slide-up"
-          style={{ borderColor: `${scoreInfo.color}35` }}
+          style={{ borderColor: 'rgba(255,255,255,0.1)' }}
         >
           <div
-            className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ background: `${scoreInfo.color}18` }}
+            className="w-12 h-12 rounded-xl flex flex-col items-center justify-center flex-shrink-0"
+            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
           >
-            <Icon
-              name={assessment.sustainabilityScore >= 70 ? 'star' : assessment.sustainabilityScore >= 50 ? 'sprout' : 'globe'}
-              size={22}
-              style={{ color: scoreInfo.color }}
-              className="text-current"
-            />
+            <span
+              className="text-sm font-bold ticker"
+              style={{ fontFamily: 'Syne, sans-serif', color: '#fff' }}
+            >
+              {assessment.sustainabilityScore}
+            </span>
+            <span className="text-[9px]" style={{ color: '#444' }}>/100</span>
           </div>
           <div>
-            <p className="font-semibold" style={{ color: scoreInfo.color }}>
+            <p className="font-semibold" style={{ color: '#fff' }}>
               {scoreInfo.label} — Score {assessment.sustainabilityScore}/100
             </p>
-            <p className="text-sm mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
+            <p className="text-sm mt-0.5" style={{ color: '#555' }}>
               {assessment.sustainabilityScore >= 90
                 ? 'Outstanding! Your footprint is well below the Paris Agreement target.'
                 : assessment.sustainabilityScore >= 70
@@ -130,12 +110,8 @@ export default function DashboardPage() {
 
         {/* Main grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
-          <div className="lg:col-span-2">
-            <FootprintCard assessment={assessment} />
-          </div>
-          <div>
-            <ScoreGauge score={assessment.sustainabilityScore} />
-          </div>
+          <div className="lg:col-span-2"><FootprintCard assessment={assessment} /></div>
+          <div><ScoreGauge score={assessment.sustainabilityScore} /></div>
         </div>
 
         {/* Charts */}
@@ -150,15 +126,12 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between mb-5">
               <h2
                 id="recommendations-heading"
-                className="text-xl font-bold flex items-center gap-2.5"
-                style={{ fontFamily: 'Syne, sans-serif', color: 'var(--color-text)' }}
+                className="text-xl font-bold"
+                style={{ fontFamily: 'Syne, sans-serif' }}
               >
-                <Icon name="robot" size={20} style={{ color: '#4F8EF7' }} className="text-current" />
                 AI Recommendations
               </h2>
-              <span className="eco-badge">
-                {assessment.recommendations.length} actions
-              </span>
+              <span className="eco-badge">{assessment.recommendations.length} actions</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {assessment.recommendations.map((rec, i) => (
@@ -172,32 +145,24 @@ export default function DashboardPage() {
         {assessments.length > 1 && (
           <section className="mt-10" aria-labelledby="history-heading">
             <div className="flex items-center justify-between mb-5">
-              <h2
-                id="history-heading"
-                className="text-xl font-bold"
-                style={{ fontFamily: 'Syne, sans-serif', color: 'var(--color-text)' }}
-              >
+              <h2 id="history-heading" className="text-xl font-bold" style={{ fontFamily: 'Syne, sans-serif' }}>
                 Recent Assessments
               </h2>
-              <Link
-                to="/history"
-                className="text-sm font-medium flex items-center gap-1 transition-colors"
-                style={{ color: '#00C27B' }}
-              >
-                View All <Icon name="arrow_right" size={14} />
+              <Link to="/history" className="text-sm animated-underline" style={{ color: '#555' }}>
+                View All
               </Link>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {assessments.slice(0, 3).map((a) => (
                 <Link key={a.id} to={`/dashboard/${a.id}`}>
                   <div className="glass-card-hover p-5">
-                    <p className="text-xs mb-2" style={{ color: 'var(--color-text-faint)' }}>
+                    <p className="text-xs mb-2 font-mono" style={{ color: '#444' }}>
                       {formatDate(a.createdAt)}
                     </p>
-                    <p className="text-xl font-bold gradient-text" style={{ fontFamily: 'Syne, sans-serif' }}>
+                    <p className="text-2xl font-bold ticker" style={{ fontFamily: 'Syne, sans-serif' }}>
                       {(a.totalEmission / 1000).toFixed(2)}t
                     </p>
-                    <p className="text-xs mt-1" style={{ color: 'var(--color-text-faint)' }}>
+                    <p className="text-xs mt-1" style={{ color: '#444' }}>
                       Score: {a.sustainabilityScore}/100
                     </p>
                   </div>

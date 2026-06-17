@@ -1,4 +1,11 @@
 import Input from '../ui/Input';
+import Icon from '../ui/Icons';
+
+const tips = [
+  { icon: 'recycle', title: 'Second-Hand', desc: 'Buying second-hand reduces emissions by 60–80%' },
+  { icon: 'wrench', title: 'Repair First', desc: 'Extending device life by 1 year saves ~150 kg CO₂' },
+  { icon: 'minus_circle', title: 'Buy Less', desc: 'The most sustainable product is one not made' },
+];
 
 export default function ShoppingForm({ data, onChange }) {
   const handleChange = (field, value) => {
@@ -13,7 +20,7 @@ export default function ShoppingForm({ data, onChange }) {
     <fieldset>
       <legend className="sr-only">Shopping and Consumer Goods Information</legend>
       <div className="space-y-6">
-        <p className="text-slate-400 text-sm leading-relaxed">
+        <p className="text-sm leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
           Manufacturing and shipping consumer goods accounts for a significant portion of personal carbon footprints.
           This includes production emissions, not just delivery.
         </p>
@@ -32,8 +39,8 @@ export default function ShoppingForm({ data, onChange }) {
               hint="Include shoes, accessories, etc. ~33 kg CO₂ per item"
             />
             {data.clothingItemsPerYear > 0 && (
-              <p className="mt-1.5 text-xs text-amber-400">
-                ≈ {clothingEmission.toLocaleString()} kg CO₂/year from clothing
+              <p className="mt-1.5 text-xs" style={{ color: '#fbbf24' }}>
+                &asymp; {clothingEmission.toLocaleString()} kg CO₂/year from clothing
               </p>
             )}
           </div>
@@ -51,8 +58,8 @@ export default function ShoppingForm({ data, onChange }) {
               hint="Smartphones, laptops, tablets, etc. ~300 kg CO₂ per device"
             />
             {data.electronicsItemsPerYear > 0 && (
-              <p className="mt-1.5 text-xs text-amber-400">
-                ≈ {electronicsEmission.toLocaleString()} kg CO₂/year from electronics
+              <p className="mt-1.5 text-xs" style={{ color: '#fbbf24' }}>
+                &asymp; {electronicsEmission.toLocaleString()} kg CO₂/year from electronics
               </p>
             )}
           </div>
@@ -60,23 +67,38 @@ export default function ShoppingForm({ data, onChange }) {
 
         {/* Shopping tips */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {[
-            { icon: '♻️', title: 'Second-Hand', desc: 'Buying second-hand reduces emissions by 60-80%' },
-            { icon: '🔧', title: 'Repair First', desc: 'Extending device life by 1 year saves ~150 kg CO₂' },
-            { icon: '🛍️', title: 'Buy Less', desc: 'The most sustainable product is one not made' },
-          ].map((tip) => (
-            <div key={tip.title} className="rounded-xl p-3 border border-white/5 bg-white/2">
-              <span className="text-xl block mb-2" aria-hidden="true">{tip.icon}</span>
-              <p className="text-sm font-semibold text-slate-300">{tip.title}</p>
-              <p className="text-xs text-slate-500 mt-1">{tip.desc}</p>
+          {tips.map((tip) => (
+            <div
+              key={tip.title}
+              className="rounded-xl p-4"
+              style={{
+                border: '1px solid rgba(255,255,255,0.05)',
+                background: 'rgba(255,255,255,0.025)',
+              }}
+            >
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center mb-3"
+                style={{ background: 'rgba(0,194,123,0.1)', color: '#00C27B' }}
+              >
+                <Icon name={tip.icon} size={15} className="text-current" />
+              </div>
+              <p className="text-sm font-semibold mb-1" style={{ color: 'var(--color-text)' }}>
+                {tip.title}
+              </p>
+              <p className="text-xs leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
+                {tip.desc}
+              </p>
             </div>
           ))}
         </div>
 
         {totalShoppingEmission > 0 && (
-          <div className="rounded-xl p-4 border border-amber-500/20 bg-amber-500/5 animate-fade-in">
-            <p className="text-sm text-amber-400 font-medium flex items-center gap-2">
-              <span aria-hidden="true">🛒</span>
+          <div
+            className="rounded-xl p-4 flex items-start gap-3 animate-fade-in"
+            style={{ border: '1px solid rgba(245,158,11,0.18)', background: 'rgba(245,158,11,0.05)' }}
+          >
+            <Icon name="shopping" size={15} style={{ color: '#fbbf24' }} className="flex-shrink-0 mt-0.5 text-current" />
+            <p className="text-sm font-medium" style={{ color: '#fbbf24' }}>
               Total shopping emissions: ~{totalShoppingEmission.toLocaleString()} kg CO₂/year
             </p>
           </div>

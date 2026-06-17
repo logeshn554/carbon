@@ -1,4 +1,11 @@
 import Input from '../ui/Input';
+import Icon from '../ui/Icons';
+
+const energyFacts = [
+  { icon: 'plug', label: 'Grid Average', value: '0.233 kg CO₂/kWh', color: '#F59E0B' },
+  { icon: 'sun', label: 'Solar', value: '~0.04 kg CO₂/kWh', color: '#FDE047' },
+  { icon: 'wind', label: 'Wind Power', value: '~0.01 kg CO₂/kWh', color: '#7aadfa' },
+];
 
 export default function EnergyForm({ data, onChange }) {
   const handleChange = (field, value) => {
@@ -27,7 +34,7 @@ export default function EnergyForm({ data, onChange }) {
           />
           <div>
             <label htmlFor="renewablePercentage" className="form-label">
-              Renewable Energy <span className="text-emerald-400">(%)</span>
+              Renewable Energy <span style={{ color: '#00C27B' }}>(%)</span>
             </label>
             <input
               id="renewablePercentage"
@@ -37,15 +44,17 @@ export default function EnergyForm({ data, onChange }) {
               step="5"
               value={data.renewablePercentage || 0}
               onChange={(e) => handleChange('renewablePercentage', parseInt(e.target.value))}
-              className="w-full mt-2 accent-emerald-500"
+              className="w-full mt-2"
               aria-valuemin={0}
               aria-valuemax={100}
               aria-valuenow={data.renewablePercentage || 0}
               aria-label="Renewable energy percentage"
             />
-            <div className="flex justify-between text-xs text-slate-500 mt-1">
+            <div className="flex justify-between text-xs mt-1" style={{ color: 'var(--color-text-faint)' }}>
               <span>0% (Grid)</span>
-              <span className="text-emerald-400 font-semibold">{data.renewablePercentage || 0}%</span>
+              <span className="font-semibold" style={{ color: '#00C27B' }}>
+                {data.renewablePercentage || 0}%
+              </span>
               <span>100% (Renewable)</span>
             </div>
           </div>
@@ -53,28 +62,40 @@ export default function EnergyForm({ data, onChange }) {
 
         {/* Energy facts */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {[
-            { icon: '🔌', label: 'Grid Average', value: '0.233 kg CO₂/kWh', color: 'text-amber-400' },
-            { icon: '☀️', label: 'Solar', value: '~0.04 kg CO₂/kWh', color: 'text-yellow-400' },
-            { icon: '🌬️', label: 'Wind Power', value: '~0.01 kg CO₂/kWh', color: 'text-cyan-400' },
-          ].map((fact) => (
-            <div key={fact.label} className="rounded-xl p-3 border border-white/5 bg-white/3 text-center">
-              <span aria-hidden="true" className="text-lg block mb-1">{fact.icon}</span>
-              <p className="text-xs text-slate-500">{fact.label}</p>
-              <p className={`text-xs font-semibold ${fact.color}`}>{fact.value}</p>
+          {energyFacts.map((fact) => (
+            <div
+              key={fact.label}
+              className="rounded-xl p-3 text-center"
+              style={{
+                border: '1px solid rgba(255,255,255,0.05)',
+                background: 'rgba(255,255,255,0.025)',
+              }}
+            >
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center mx-auto mb-2"
+                style={{ background: `${fact.color}15` }}
+              >
+                <Icon name={fact.icon} size={15} style={{ color: fact.color }} className="text-current" />
+              </div>
+              <p className="text-xs" style={{ color: 'var(--color-text-faint)' }}>{fact.label}</p>
+              <p className="text-xs font-semibold mt-0.5" style={{ color: fact.color }}>{fact.value}</p>
             </div>
           ))}
         </div>
 
         {/* Live estimate */}
         {data.monthlyElectricityKwh > 0 && (
-          <div className="rounded-xl p-4 border border-blue-500/20 bg-blue-500/5 animate-fade-in">
-            <p className="text-sm text-blue-400 font-medium flex items-center gap-2">
-              <span aria-hidden="true">💡</span>
+          <div
+            className="rounded-xl p-4 flex items-start gap-3 animate-fade-in"
+            style={{ border: '1px solid rgba(79,142,247,0.18)', background: 'rgba(79,142,247,0.05)' }}
+          >
+            <Icon name="info" size={15} style={{ color: '#4F8EF7' }} className="flex-shrink-0 mt-0.5 text-current" />
+            <p className="text-sm font-medium" style={{ color: '#7aadfa' }}>
               Your energy emissions: ~{nonRenewableEmission.toLocaleString()} kg CO₂/year
               {data.renewablePercentage > 0 && (
-                <span className="text-emerald-400">
-                  ({data.renewablePercentage}% renewable saves {Math.round(data.monthlyElectricityKwh * 12 * 0.233 * (data.renewablePercentage / 100)).toLocaleString()} kg)
+                <span style={{ color: '#00C27B' }}>
+                  {' '}({data.renewablePercentage}% renewable saves{' '}
+                  {Math.round(data.monthlyElectricityKwh * 12 * 0.233 * (data.renewablePercentage / 100)).toLocaleString()} kg)
                 </span>
               )}
             </p>

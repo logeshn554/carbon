@@ -6,7 +6,12 @@ import { PageLoader } from '../components/ui/LoadingSpinner';
 import Button from '../components/ui/Button';
 import { formatDate, formatRelativeTime, getScoreInfo, formatNumber } from '../utils/formatters';
 
-const CATEGORY_ICONS = { transport: '🚗', energy: '⚡', food: '🍽️', shopping: '🛍️' };
+const CATEGORY_LABELS = {
+  transport: 'Transport',
+  energy: 'Energy',
+  food: 'Food',
+  shopping: 'Shopping',
+};
 
 export default function HistoryPage() {
   const { user } = useUser();
@@ -17,37 +22,25 @@ export default function HistoryPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  if (!user) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <span className="text-5xl block mb-4" aria-hidden="true">👤</span>
-          <h1 className="text-2xl font-display font-bold text-slate-200 mb-3">Sign In to View History</h1>
-          <p className="text-slate-400 mb-6">
-            Start your first assessment to create an account and begin tracking your carbon footprint over time.
-          </p>
-          <Link to="/calculator"><Button>Start Assessment</Button></Link>
-        </div>
-      </div>
-    );
-  }
-
   if (loading) return <PageLoader />;
 
   if (!assessments.length) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-4">
         <div className="text-center max-w-md">
-          <span className="text-5xl block mb-4" aria-hidden="true">📊</span>
-          <h1 className="text-2xl font-display font-bold text-slate-200 mb-3">No Assessments Yet</h1>
-          <p className="text-slate-400 mb-6">Complete your first carbon footprint assessment to start tracking your progress.</p>
+          <p className="text-xs font-mono mb-4" style={{ color: '#333', letterSpacing: '0.1em' }}>NO DATA</p>
+          <h1 className="text-2xl font-bold mb-3" style={{ fontFamily: 'Syne, sans-serif' }}>
+            No Assessments Yet
+          </h1>
+          <p className="mb-6" style={{ color: '#555' }}>
+            Complete your first carbon footprint assessment to start tracking your progress.
+          </p>
           <Link to="/calculator"><Button>Start First Assessment</Button></Link>
         </div>
       </div>
     );
   }
 
-  // Calculate trend
   const sorted = [...assessments].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
   const latest = sorted[sorted.length - 1];
   const earliest = sorted[0];
@@ -55,59 +48,66 @@ export default function HistoryPage() {
   const hasImproved = totalReduction > 0;
 
   return (
-    <div className="min-h-screen py-8 px-4">
+    <div className="min-h-screen py-10 px-4">
       <div className="max-w-5xl mx-auto">
+
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <div className="eco-badge inline-flex mb-2">
-              <span aria-hidden="true">📈</span>
-              Progress Tracking
-            </div>
-            <h1 className="text-3xl font-display font-bold text-slate-100">
+            <div className="eco-badge inline-flex mb-3">Progress Tracking</div>
+            <h1 className="text-3xl font-bold" style={{ fontFamily: 'Syne, sans-serif' }}>
               Assessment History
             </h1>
-            <p className="text-slate-500 text-sm mt-1">Welcome back, {user.name}</p>
           </div>
           <Link to="/calculator">
-            <Button id="btn-new-assessment-history">
-              <span aria-hidden="true">+</span> New Assessment
-            </Button>
+            <Button id="btn-new-assessment-history">New Assessment</Button>
           </Link>
         </div>
 
         {/* Summary cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <div className="glass-card p-5 text-center">
-            <p className="text-slate-500 text-xs uppercase tracking-wider mb-2">Total Assessments</p>
-            <p className="text-3xl font-display font-bold gradient-text">{assessments.length}</p>
-          </div>
-          <div className="glass-card p-5 text-center">
-            <p className="text-slate-500 text-xs uppercase tracking-wider mb-2">Latest Score</p>
-            <p className={`text-3xl font-display font-bold ${getScoreInfo(latest.sustainabilityScore).textClass}`}>
-              {latest.sustainabilityScore}/100
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+          <div className="glass-card p-6 text-center">
+            <p className="text-xs font-mono uppercase tracking-widest mb-3" style={{ color: '#444' }}>
+              Total Assessments
             </p>
-            <p className="text-xs text-slate-600 mt-1">{getScoreInfo(latest.sustainabilityScore).label}</p>
+            <p className="text-4xl font-bold ticker" style={{ fontFamily: 'Syne, sans-serif' }}>
+              {assessments.length}
+            </p>
+          </div>
+          <div className="glass-card p-6 text-center">
+            <p className="text-xs font-mono uppercase tracking-widest mb-3" style={{ color: '#444' }}>
+              Latest Score
+            </p>
+            <p className="text-4xl font-bold ticker" style={{ fontFamily: 'Syne, sans-serif' }}>
+              {latest.sustainabilityScore}
+              <span className="text-xl" style={{ color: '#444' }}>/100</span>
+            </p>
+            <p className="text-xs mt-1.5" style={{ color: '#444' }}>
+              {getScoreInfo(latest.sustainabilityScore).label}
+            </p>
           </div>
           {assessments.length > 1 && (
-            <div className={`glass-card p-5 text-center border ${hasImproved ? 'border-emerald-500/20' : 'border-rose-500/20'}`}>
-              <p className="text-slate-500 text-xs uppercase tracking-wider mb-2">
+            <div
+              className="glass-card p-6 text-center"
+              style={{ borderColor: hasImproved ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.08)' }}
+            >
+              <p className="text-xs font-mono uppercase tracking-widest mb-3" style={{ color: '#444' }}>
                 {hasImproved ? 'Total Reduction' : 'Change'}
               </p>
-              <p className={`text-3xl font-display font-bold ${hasImproved ? 'text-emerald-400' : 'text-rose-400'}`}>
+              <p className="text-4xl font-bold ticker" style={{ fontFamily: 'Syne, sans-serif' }}>
                 {hasImproved ? '−' : '+'}{formatNumber(Math.abs(totalReduction))}
               </p>
-              <p className="text-xs text-slate-500 mt-1">kg CO₂ since first assessment</p>
+              <p className="text-xs mt-1.5" style={{ color: '#444' }}>kg CO₂ since first assessment</p>
             </div>
           )}
         </div>
 
-        {/* Assessment list */}
+        {/* List */}
         <section aria-label="Assessment history">
-          <h2 className="text-lg font-semibold text-slate-300 mb-4">
-            All Assessments ({assessments.length})
+          <h2 className="text-sm font-mono mb-5" style={{ color: '#333', letterSpacing: '0.08em' }}>
+            ALL ASSESSMENTS ({assessments.length})
           </h2>
-          <div className="space-y-4">
+          <div className="space-y-3">
             {assessments.map((a, i) => {
               const scoreInfo = getScoreInfo(a.sustainabilityScore);
               const isLatest = i === 0;
@@ -115,44 +115,50 @@ export default function HistoryPage() {
                 <article
                   key={a.id}
                   className="glass-card-hover p-5 animate-slide-up"
-                  style={{ animationDelay: `${i * 0.05}s` }}
+                  style={{ animationDelay: `${i * 0.04}s` }}
                   aria-label={`Assessment from ${formatDate(a.createdAt)}, score ${a.sustainabilityScore}`}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-5">
                       {/* Score badge */}
                       <div
-                        className={`w-14 h-14 rounded-2xl flex flex-col items-center justify-center flex-shrink-0 border ${scoreInfo.borderClass} ${scoreInfo.bgClass}`}
+                        className="w-14 h-14 rounded-xl flex flex-col items-center justify-center flex-shrink-0"
+                        style={{
+                          background: 'rgba(255,255,255,0.04)',
+                          border: '1px solid rgba(255,255,255,0.1)',
+                        }}
                       >
-                        <span className={`text-lg font-display font-bold ${scoreInfo.textClass}`}>
+                        <span
+                          className="text-lg font-bold ticker"
+                          style={{ fontFamily: 'Syne, sans-serif', color: '#fff' }}
+                        >
                           {a.sustainabilityScore}
                         </span>
-                        <span className="text-[9px] text-slate-500">/100</span>
+                        <span className="text-[9px]" style={{ color: '#444' }}>/100</span>
                       </div>
 
                       <div>
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <p className="font-semibold text-slate-200">
+                        <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                          <p className="font-semibold" style={{ color: '#fff' }}>
                             {formatDate(a.createdAt)}
                           </p>
                           {isLatest && (
                             <span className="eco-badge text-[10px] px-2 py-0.5">Latest</span>
                           )}
                         </div>
-                        <p className="text-slate-500 text-sm mt-0.5">
+                        <p className="text-sm" style={{ color: '#555' }}>
                           {formatRelativeTime(a.createdAt)} · {(a.totalEmission / 1000).toFixed(2)} tonnes CO₂/year
                         </p>
-
-                        {/* Category breakdown mini */}
-                        <div className="flex items-center gap-3 mt-2">
+                        {/* Category breakdown */}
+                        <div className="flex items-center gap-4 mt-2">
                           {[
                             { key: 'transport', val: a.transportEmission },
                             { key: 'energy', val: a.energyEmission },
                             { key: 'food', val: a.foodEmission },
                             { key: 'shopping', val: a.shoppingEmission },
                           ].map(({ key, val }) => (
-                            <span key={key} className="flex items-center gap-1 text-xs text-slate-600">
-                              <span aria-hidden="true">{CATEGORY_ICONS[key]}</span>
+                            <span key={key} className="text-xs" style={{ color: '#444' }}>
+                              <span style={{ color: '#555' }}>{CATEGORY_LABELS[key][0]}</span>{' '}
                               {formatNumber(val)}kg
                             </span>
                           ))}
@@ -160,17 +166,12 @@ export default function HistoryPage() {
                       </div>
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex gap-2 flex-wrap sm:flex-nowrap">
+                    <div className="flex gap-2">
                       <Link to={`/simulator/${a.id}`}>
-                        <Button variant="secondary" size="sm">
-                          <span aria-hidden="true">🔬</span> Simulate
-                        </Button>
+                        <Button variant="secondary" size="sm">Simulate</Button>
                       </Link>
                       <Link to={`/dashboard/${a.id}`}>
-                        <Button size="sm">
-                          View →
-                        </Button>
+                        <Button size="sm">View</Button>
                       </Link>
                     </div>
                   </div>

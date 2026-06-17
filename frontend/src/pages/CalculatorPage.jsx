@@ -9,13 +9,12 @@ import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import { useAssessment } from '../hooks/useAssessment';
 import { useUser } from '../hooks/useUser';
-import Icon from '../components/ui/Icons';
 
 const STEPS = [
-  { id: 'transport', label: 'Transport', sublabel: 'Car & flights', icon: 'transport' },
-  { id: 'energy', label: 'Energy', sublabel: 'Home electricity', icon: 'energy' },
-  { id: 'food', label: 'Food', sublabel: 'Diet & meals', icon: 'food' },
-  { id: 'shopping', label: 'Shopping', sublabel: 'Consumer goods', icon: 'shopping' },
+  { id: 'transport', label: 'Transport', sublabel: 'Car & flights' },
+  { id: 'energy', label: 'Energy', sublabel: 'Home electricity' },
+  { id: 'food', label: 'Food', sublabel: 'Diet & meals' },
+  { id: 'shopping', label: 'Shopping', sublabel: 'Consumer goods' },
 ];
 
 const DEFAULT_DATA = {
@@ -61,17 +60,11 @@ export default function CalculatorPage() {
     if (!user?.id) return;
     setSubmitError('');
     try {
-      const result = await createAssessment({
-        ...formData,
-        userId: user.id,
-      });
+      const result = await createAssessment({ ...formData, userId: user.id });
       if (result?.id) {
         navigate(`/dashboard/${result.id}`);
-      } else {
-        console.error('Assessment created but no ID returned:', result);
       }
     } catch (err) {
-      console.error('Assessment failed:', err);
       setSubmitError(err.message || 'Submission failed. Please check your connection and try again.');
     }
   };
@@ -87,26 +80,44 @@ export default function CalculatorPage() {
   };
 
   const isLastStep = currentStep === STEPS.length - 1;
+  const progress = ((currentStep + 1) / STEPS.length) * 100;
 
   return (
     <div className="min-h-screen py-10 px-4">
       <div className="max-w-2xl mx-auto">
 
-        {/* Page header */}
-        <div className="text-center mb-10">
+        {/* Header */}
+        <div className="mb-10">
           <div className="eco-badge inline-flex mb-5">
-            <Icon name="calculator" size={13} />
             Carbon Footprint Calculator
           </div>
           <h1
-            className="text-3xl font-bold mb-3"
-            style={{ fontFamily: 'Syne, sans-serif', color: 'var(--color-text)' }}
+            className="text-3xl sm:text-4xl font-bold mb-3"
+            style={{ fontFamily: 'Syne, sans-serif' }}
           >
             Calculate Your Footprint
           </h1>
-          <p style={{ color: 'var(--color-text-muted)' }}>
+          <p style={{ color: '#555' }}>
             Answer 4 sections of questions to get your personalized carbon footprint analysis.
           </p>
+
+          {/* Dynamic progress bar */}
+          <div className="mt-6">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-xs font-mono" style={{ color: '#444' }}>
+                Step {currentStep + 1} of {STEPS.length}
+              </span>
+              <span className="text-xs font-mono" style={{ color: '#444' }}>
+                {Math.round(progress)}% complete
+              </span>
+            </div>
+            <div className="h-px" style={{ background: 'rgba(255,255,255,0.06)' }}>
+              <div
+                className="h-full transition-all duration-500"
+                style={{ width: `${progress}%`, background: '#fff' }}
+              />
+            </div>
+          </div>
         </div>
 
         {/* Step indicator */}
@@ -115,21 +126,21 @@ export default function CalculatorPage() {
         {/* Form card */}
         <Card className="mb-6">
           <div className="mb-7">
-            <div className="flex items-center gap-3 mb-1">
-              <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: 'rgba(0,194,123,0.12)', color: '#00C27B' }}
+            <div className="flex items-center gap-3">
+              <span
+                className="text-xs font-mono px-2 py-1 rounded"
+                style={{ background: 'rgba(255,255,255,0.05)', color: '#888', border: '1px solid rgba(255,255,255,0.08)', letterSpacing: '0.1em' }}
               >
-                <Icon name={STEPS[currentStep].icon} size={18} />
-              </div>
+                {String(currentStep + 1).padStart(2, '0')}
+              </span>
               <div>
                 <h2
                   className="text-xl font-bold"
-                  style={{ fontFamily: 'Syne, sans-serif', color: 'var(--color-text)' }}
+                  style={{ fontFamily: 'Syne, sans-serif' }}
                 >
                   {STEPS[currentStep].label}
                 </h2>
-                <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                <p className="text-xs" style={{ color: '#555' }}>
                   {STEPS[currentStep].sublabel}
                 </p>
               </div>
@@ -144,12 +155,11 @@ export default function CalculatorPage() {
         {/* Error */}
         {submitError && (
           <div
-            className="rounded-xl p-4 mb-5 flex items-start gap-3"
-            style={{ background: 'rgba(244,63,94,0.08)', border: '1px solid rgba(244,63,94,0.2)' }}
+            className="rounded-xl p-4 mb-5"
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)' }}
             role="alert"
           >
-            <Icon name="info" size={16} className="flex-shrink-0 mt-0.5" style={{ color: '#f43f5e' }} />
-            <p className="text-sm" style={{ color: '#fb7185' }}>{submitError}</p>
+            <p className="text-sm" style={{ color: '#aaa' }}>{submitError}</p>
           </div>
         )}
 
@@ -162,24 +172,23 @@ export default function CalculatorPage() {
             id="btn-back"
             aria-label="Go to previous step"
           >
-            <Icon name="arrow_left" size={16} />
             Back
           </Button>
 
-          {/* Progress dots */}
-          <div className="flex items-center gap-2" aria-hidden="true">
+          {/* Step pills */}
+          <div className="flex items-center gap-1.5" aria-hidden="true">
             {STEPS.map((_, i) => (
               <div
                 key={i}
                 className="rounded-full transition-all duration-300"
                 style={{
-                  width: i === currentStep ? 20 : 6,
-                  height: 6,
+                  width: i === currentStep ? 24 : 5,
+                  height: 5,
                   background: i === currentStep
-                    ? '#00C27B'
+                    ? '#fff'
                     : i < currentStep
-                    ? 'rgba(0,194,123,0.5)'
-                    : 'rgba(255,255,255,0.12)',
+                    ? 'rgba(255,255,255,0.3)'
+                    : 'rgba(255,255,255,0.1)',
                 }}
               />
             ))}
@@ -192,10 +201,6 @@ export default function CalculatorPage() {
             aria-label={isLastStep ? 'Calculate my carbon footprint' : 'Go to next step'}
           >
             {isLastStep ? 'Calculate' : 'Next'}
-            {!loading && (isLastStep
-              ? <Icon name="chart" size={16} className="text-white" />
-              : <Icon name="arrow_right" size={16} className="text-white" />
-            )}
           </Button>
         </div>
       </div>
