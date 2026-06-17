@@ -1,40 +1,34 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { userService } from '../services/userService';
 
 const UserContext = createContext(null);
 
-const USER_STORAGE_KEY = 'ecoguide_user';
+const USER_STORAGE_KEY = 'ecoguide_anon_id';
+
+/**
+ * Generates or retrieves a persistent anonymous user ID.
+ * No login, no email, no password — just a UUID tied to the browser.
+ */
+function getOrCreateAnonId() {
+  let id = localStorage.getItem(USER_STORAGE_KEY);
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem(USER_STORAGE_KEY, id);
+  }
+  return id;
+}
 
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const stored = localStorage.getItem(USER_STORAGE_KEY);
-    if (stored) {
-      try {
-        setUser(JSON.parse(stored));
-      } catch {
-        localStorage.removeItem(USER_STORAGE_KEY);
-      }
-    }
+    const id = getOrCreateAnonId();
+    setUser({ id, name: 'Anonymous' });
     setLoading(false);
   }, []);
 
-  const login = async (name, email) => {
-    const userData = await userService.createOrFind({ name, email });
-    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData));
-    setUser(userData);
-    return userData;
-  };
-
-  const logout = () => {
-    localStorage.removeItem(USER_STORAGE_KEY);
-    setUser(null);
-  };
-
   return (
-    <UserContext.Provider value={{ user, loading, login, logout }}>
+    <UserContext.Provider value={{ user, loading }}>
       {children}
     </UserContext.Provider>
   );
