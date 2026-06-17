@@ -11,6 +11,9 @@ import simulationRoutes from './routes/simulations.js';
 
 const app = express();
 
+// Trust Railway/Vercel reverse proxy for accurate IP and HTTPS
+app.set('trust proxy', 1);
+
 // ── Security Middleware ──────────────────────────────────────────────────────
 app.use(helmet({
   contentSecurityPolicy: {
@@ -25,8 +28,9 @@ app.use(helmet({
 
 // ── CORS ─────────────────────────────────────────────────────────────────────
 const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
+const corsOrigins = corsOrigin.split(',').map((o) => o.trim()).filter(Boolean);
 app.use(cors({
-  origin: corsOrigin.split(',').map((o) => o.trim()),
+  origin: corsOrigins.length === 1 ? corsOrigins[0] : corsOrigins,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,

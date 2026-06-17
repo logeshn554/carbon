@@ -19,6 +19,7 @@ export default function SimulatorPage() {
 
   useEffect(() => {
     if (assessmentId) fetchAssessment(assessmentId);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [assessmentId]);
 
   const handleRun = async () => {
@@ -142,7 +143,7 @@ export default function SimulatorPage() {
             )}
 
             {/* History */}
-            {history.length > 1 && (
+            {history.length > 0 && (
               <Card>
                 <h3 className="text-slate-200 font-semibold mb-4">Simulation History</h3>
                 <div className="space-y-3">

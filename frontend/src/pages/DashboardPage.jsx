@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAssessment, useUserAssessments } from '../hooks/useAssessment';
 import { useUser } from '../hooks/useUser';
@@ -17,12 +17,18 @@ export default function DashboardPage() {
   const { user } = useUser();
   const { assessments, fetchAssessments } = useUserAssessments(user?.id);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (assessmentId) fetchAssessment(assessmentId);
+  // fetchAssessment is stable between renders — recreated only on unmount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [assessmentId]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (user?.id) fetchAssessments();
+  // fetchAssessments is stable between renders
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
   if (loading) return <PageLoader />;

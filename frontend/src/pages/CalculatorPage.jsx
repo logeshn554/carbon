@@ -72,9 +72,16 @@ export default function CalculatorPage() {
         ...formData,
         userId: currentUser.id,
       });
-      navigate(`/dashboard/${result.id}`);
+      if (result?.id) {
+        navigate(`/dashboard/${result.id}`);
+      } else {
+        console.error('Assessment created but no ID returned:', result);
+      }
     } catch (err) {
       console.error('Assessment failed:', err);
+      // Re-open modal so user can see the error
+      setErrors({ general: err.message || 'Submission failed. Please check your connection and try again.' });
+      setShowUserModal(true);
     }
   };
 
@@ -88,12 +95,15 @@ export default function CalculatorPage() {
       return;
     }
 
+    // Clear previous errors before retrying
+    setErrors({});
+
     try {
       const newUser = await login(userName, userEmail);
       setShowUserModal(false);
       handleSubmit(newUser);
     } catch (err) {
-      setErrors({ general: err.message });
+      setErrors({ general: err.message || 'Failed to create account. Please try again.' });
     }
   };
 

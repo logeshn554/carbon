@@ -14,6 +14,7 @@ export default function HistoryPage() {
 
   useEffect(() => {
     if (user?.id) fetchAssessments();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
   if (!user) {

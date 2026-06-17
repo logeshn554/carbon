@@ -4,19 +4,30 @@ export default function Modal({ children, onClose, title }) {
   const overlayRef = useRef(null);
   const modalRef = useRef(null);
 
-  // Trap focus within modal
+  // Focus on mount (respecting autoFocus if present)
   useEffect(() => {
-    const focusableElements = modalRef.current?.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    );
-    const firstElement = focusableElements?.[0];
-    const lastElement = focusableElements?.[focusableElements.length - 1];
+    const autoFocusElement = modalRef.current?.querySelector('[autoFocus]');
+    if (autoFocusElement) {
+      autoFocusElement.focus();
+    } else {
+      const focusableElements = modalRef.current?.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      focusableElements?.[0]?.focus();
+    }
+  }, []);
 
-    firstElement?.focus();
-
+  // Trap focus and close on Escape
+  useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') onClose();
       if (e.key === 'Tab') {
+        const focusableElements = modalRef.current?.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstElement = focusableElements?.[0];
+        const lastElement = focusableElements?.[focusableElements.length - 1];
+
         if (e.shiftKey) {
           if (document.activeElement === firstElement) {
             e.preventDefault();
