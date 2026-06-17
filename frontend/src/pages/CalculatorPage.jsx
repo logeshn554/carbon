@@ -7,16 +7,15 @@ import FoodForm from '../components/calculator/FoodForm';
 import ShoppingForm from '../components/calculator/ShoppingForm';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
-import Modal from '../components/layout/Modal';
-import Input from '../components/ui/Input';
 import { useAssessment } from '../hooks/useAssessment';
 import { useUser } from '../hooks/useUser';
+import Icon from '../components/ui/Icons';
 
 const STEPS = [
-  { id: 'transport', label: 'Transport', sublabel: 'Car & flights', icon: '🚗' },
-  { id: 'energy', label: 'Energy', sublabel: 'Home electricity', icon: '⚡' },
-  { id: 'food', label: 'Food', sublabel: 'Diet & meals', icon: '🍽️' },
-  { id: 'shopping', label: 'Shopping', sublabel: 'Consumer goods', icon: '🛍️' },
+  { id: 'transport', label: 'Transport', sublabel: 'Car & flights', icon: 'transport' },
+  { id: 'energy', label: 'Energy', sublabel: 'Home electricity', icon: 'energy' },
+  { id: 'food', label: 'Food', sublabel: 'Diet & meals', icon: 'food' },
+  { id: 'shopping', label: 'Shopping', sublabel: 'Consumer goods', icon: 'shopping' },
 ];
 
 const DEFAULT_DATA = {
@@ -36,13 +35,10 @@ const DEFAULT_DATA = {
 export default function CalculatorPage() {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState(DEFAULT_DATA);
-  const [showUserModal, setShowUserModal] = useState(false);
-  const [userName, setUserName] = useState('');
-  const [userEmail, setUserEmail] = useState('');
-  const [errors, setErrors] = useState({});
+  const [submitError, setSubmitError] = useState('');
 
   const { createAssessment, loading } = useAssessment();
-  const { user, login } = useUser();
+  const { user } = useUser();
   const navigate = useNavigate();
 
   const handleNext = () => {
@@ -50,12 +46,7 @@ export default function CalculatorPage() {
       setCurrentStep(currentStep + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-      // Final step — need user info
-      if (!user) {
-        setShowUserModal(true);
-      } else {
-        handleSubmit(user);
-      }
+      handleSubmit();
     }
   };
 
@@ -66,11 +57,13 @@ export default function CalculatorPage() {
     }
   };
 
-  const handleSubmit = async (currentUser) => {
+  const handleSubmit = async () => {
+    if (!user?.id) return;
+    setSubmitError('');
     try {
       const result = await createAssessment({
         ...formData,
-        userId: currentUser.id,
+        userId: user.id,
       });
       if (result?.id) {
         navigate(`/dashboard/${result.id}`);
@@ -79,31 +72,7 @@ export default function CalculatorPage() {
       }
     } catch (err) {
       console.error('Assessment failed:', err);
-      // Re-open modal so user can see the error
-      setErrors({ general: err.message || 'Submission failed. Please check your connection and try again.' });
-      setShowUserModal(true);
-    }
-  };
-
-  const handleUserSubmit = async () => {
-    const newErrors = {};
-    if (!userName.trim() || userName.length < 2) newErrors.name = 'Name must be at least 2 characters';
-    if (!userEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userEmail)) newErrors.email = 'Please enter a valid email';
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
-    // Clear previous errors before retrying
-    setErrors({});
-
-    try {
-      const newUser = await login(userName, userEmail);
-      setShowUserModal(false);
-      handleSubmit(newUser);
-    } catch (err) {
-      setErrors({ general: err.message || 'Failed to create account. Please try again.' });
+      setSubmitError(err.message || 'Submission failed. Please check your connection and try again.');
     }
   };
 
@@ -120,18 +89,22 @@ export default function CalculatorPage() {
   const isLastStep = currentStep === STEPS.length - 1;
 
   return (
-    <div className="min-h-screen py-8 px-4">
+    <div className="min-h-screen py-10 px-4">
       <div className="max-w-2xl mx-auto">
+
         {/* Page header */}
-        <div className="text-center mb-8">
-          <div className="eco-badge inline-flex mb-4">
-            <span aria-hidden="true">🧮</span>
+        <div className="text-center mb-10">
+          <div className="eco-badge inline-flex mb-5">
+            <Icon name="calculator" size={13} />
             Carbon Footprint Calculator
           </div>
-          <h1 className="text-3xl font-display font-bold text-slate-100 mb-2">
+          <h1
+            className="text-3xl font-bold mb-3"
+            style={{ fontFamily: 'Syne, sans-serif', color: 'var(--color-text)' }}
+          >
             Calculate Your Footprint
           </h1>
-          <p className="text-slate-400">
+          <p style={{ color: 'var(--color-text-muted)' }}>
             Answer 4 sections of questions to get your personalized carbon footprint analysis.
           </p>
         </div>
@@ -141,12 +114,26 @@ export default function CalculatorPage() {
 
         {/* Form card */}
         <Card className="mb-6">
-          <div className="mb-6">
-            <h2 className="text-xl font-display font-semibold text-slate-100 flex items-center gap-2">
-              <span aria-hidden="true">{STEPS[currentStep].icon}</span>
-              {STEPS[currentStep].label}
-            </h2>
-            <p className="text-slate-500 text-sm mt-1">{STEPS[currentStep].sublabel}</p>
+          <div className="mb-7">
+            <div className="flex items-center gap-3 mb-1">
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: 'rgba(0,194,123,0.12)', color: '#00C27B' }}
+              >
+                <Icon name={STEPS[currentStep].icon} size={18} />
+              </div>
+              <div>
+                <h2
+                  className="text-xl font-bold"
+                  style={{ fontFamily: 'Syne, sans-serif', color: 'var(--color-text)' }}
+                >
+                  {STEPS[currentStep].label}
+                </h2>
+                <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                  {STEPS[currentStep].sublabel}
+                </p>
+              </div>
+            </div>
           </div>
 
           <div className="animate-fade-in" key={currentStep}>
@@ -154,7 +141,19 @@ export default function CalculatorPage() {
           </div>
         </Card>
 
-        {/* Navigation buttons */}
+        {/* Error */}
+        {submitError && (
+          <div
+            className="rounded-xl p-4 mb-5 flex items-start gap-3"
+            style={{ background: 'rgba(244,63,94,0.08)', border: '1px solid rgba(244,63,94,0.2)' }}
+            role="alert"
+          >
+            <Icon name="info" size={16} className="flex-shrink-0 mt-0.5" style={{ color: '#f43f5e' }} />
+            <p className="text-sm" style={{ color: '#fb7185' }}>{submitError}</p>
+          </div>
+        )}
+
+        {/* Navigation */}
         <div className="flex items-center justify-between gap-4">
           <Button
             variant="secondary"
@@ -163,18 +162,25 @@ export default function CalculatorPage() {
             id="btn-back"
             aria-label="Go to previous step"
           >
-            ← Back
+            <Icon name="arrow_left" size={16} />
+            Back
           </Button>
 
-          <div className="flex items-center gap-2">
+          {/* Progress dots */}
+          <div className="flex items-center gap-2" aria-hidden="true">
             {STEPS.map((_, i) => (
               <div
                 key={i}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  i === currentStep ? 'bg-emerald-400 scale-125' :
-                  i < currentStep ? 'bg-emerald-600' : 'bg-white/15'
-                }`}
-                aria-hidden="true"
+                className="rounded-full transition-all duration-300"
+                style={{
+                  width: i === currentStep ? 20 : 6,
+                  height: 6,
+                  background: i === currentStep
+                    ? '#00C27B'
+                    : i < currentStep
+                    ? 'rgba(0,194,123,0.5)'
+                    : 'rgba(255,255,255,0.12)',
+                }}
               />
             ))}
           </div>
@@ -185,57 +191,14 @@ export default function CalculatorPage() {
             id="btn-next"
             aria-label={isLastStep ? 'Calculate my carbon footprint' : 'Go to next step'}
           >
-            {isLastStep ? '🧮 Calculate' : 'Next →'}
+            {isLastStep ? 'Calculate' : 'Next'}
+            {!loading && (isLastStep
+              ? <Icon name="chart" size={16} className="text-white" />
+              : <Icon name="arrow_right" size={16} className="text-white" />
+            )}
           </Button>
         </div>
       </div>
-
-      {/* User info modal */}
-      {showUserModal && (
-        <Modal
-          title="Almost there! 🌿"
-          onClose={() => setShowUserModal(false)}
-        >
-          <p className="text-slate-400 text-sm mb-6">
-            Enter your name and email to save your assessment and track your progress over time.
-            No password needed — just your email for identification.
-          </p>
-          <div className="space-y-4">
-            <Input
-              id="user-name"
-              label="Your Name"
-              type="text"
-              placeholder="Alice Green"
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-              error={errors.name}
-              required
-              autoFocus
-            />
-            <Input
-              id="user-email"
-              label="Email Address"
-              type="email"
-              placeholder="alice@example.com"
-              value={userEmail}
-              onChange={(e) => setUserEmail(e.target.value)}
-              error={errors.email}
-              required
-            />
-            {errors.general && (
-              <p className="text-rose-400 text-sm" role="alert">{errors.general}</p>
-            )}
-            <Button
-              onClick={handleUserSubmit}
-              loading={loading}
-              className="w-full"
-              id="btn-calculate"
-            >
-              🌍 Calculate My Footprint
-            </Button>
-          </div>
-        </Modal>
-      )}
     </div>
   );
 }
