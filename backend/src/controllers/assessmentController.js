@@ -28,9 +28,21 @@ export const createAssessment = async (req, res, next) => {
   try {
     const data = assessmentSchema.parse(req.body);
 
-    // Verify user exists
-    const user = await prisma.user.findUnique({ where: { id: data.userId } });
-    if (!user) throw new AppError('User not found', 404);
+    // Auto-upsert user — if frontend registration failed or DB was wiped,
+    // create the user on the fly so the assessment never fails with "User not found"
+    let user = await prisma.user.findUnique({ where: { id: data.userId } });
+    if (!user) {
+      user = await prisma.user.upsert({
+        where: { email: `${data.userId}@ecoguide.ai` },
+        update: {},
+        create: {
+          name: 'Anonymous',
+          email: `${data.userId}@ecoguide.ai`,
+        },
+      });
+      // Use the actual DB-assigned id for this assessment
+      data.userId = user.id;
+    }
 
     // Calculate emissions
     const emissions = calculateAllEmissions(data);
