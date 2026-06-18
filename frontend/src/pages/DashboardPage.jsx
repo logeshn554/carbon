@@ -25,9 +25,9 @@ export default function DashboardPage() {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (user?.id) fetchAssessments();
+    if (user?.id && user?.isRegistered) fetchAssessments();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+  }, [user?.id, user?.isRegistered]);
 
   if (loading) return <PageLoader />;
 

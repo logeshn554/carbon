@@ -30,7 +30,25 @@ app.use(helmet({
 const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
 const corsOrigins = corsOrigin.split(',').map((o) => o.trim()).filter(Boolean);
 app.use(cors({
-  origin: corsOrigins.length === 1 ? corsOrigins[0] : corsOrigins,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    // Allow local development origin
+    if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+      return callback(null, true);
+    }
+
+    // Check if origin matches any allowed origin or is a Vercel deployment
+    const isAllowed = corsOrigins.some((allowed) => origin === allowed) ||
+                      origin.endsWith('.vercel.app');
+
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      callback(null, false);
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,

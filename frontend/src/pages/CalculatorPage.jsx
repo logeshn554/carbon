@@ -37,7 +37,7 @@ export default function CalculatorPage() {
   const [submitError, setSubmitError] = useState('');
 
   const { createAssessment, loading } = useAssessment();
-  const { user } = useUser();
+  const { user, registerUser, resetUser } = useUser();
   const navigate = useNavigate();
 
   const handleNext = () => {
@@ -60,11 +60,30 @@ export default function CalculatorPage() {
     if (!user?.id) return;
     setSubmitError('');
     try {
-      const result = await createAssessment({ ...formData, userId: user.id });
+      let activeUser = user;
+      if (!user.isRegistered) {
+        activeUser = await registerUser();
+      }
+
+      const result = await createAssessment({ ...formData, userId: activeUser.id });
       if (result?.id) {
         navigate(`/dashboard/${result.id}`);
       }
     } catch (err) {
+      if (err.message?.includes('User not found')) {
+        try {
+          const newUser = resetUser();
+          const registeredUser = await registerUser(newUser.id);
+          const result = await createAssessment({ ...formData, userId: registeredUser.id });
+          if (result?.id) {
+            navigate(`/dashboard/${result.id}`);
+            return;
+          }
+        } catch (retryErr) {
+          setSubmitError(retryErr.message || 'Submission failed. Please try again.');
+          return;
+        }
+      }
       setSubmitError(err.message || 'Submission failed. Please check your connection and try again.');
     }
   };

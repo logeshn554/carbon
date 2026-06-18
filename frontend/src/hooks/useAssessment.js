@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { assessmentService } from '../services/assessmentService';
+import { useUser } from './useUser';
 
 export function useAssessment() {
   const [assessment, setAssessment] = useState(null);
@@ -43,6 +44,7 @@ export function useUserAssessments(userId) {
   const [assessments, setAssessments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { resetUser } = useUser();
 
   const fetchAssessments = async () => {
     if (!userId) return;
@@ -54,6 +56,9 @@ export function useUserAssessments(userId) {
       return results;
     } catch (err) {
       setError(err.message);
+      if (err.message?.includes('User not found')) {
+        resetUser();
+      }
     } finally {
       setLoading(false);
     }
