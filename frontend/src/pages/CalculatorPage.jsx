@@ -106,30 +106,16 @@ export default function CalculatorPage() {
     if (!user?.id) return;
     setSubmitError('');
     try {
-      let activeUser = user;
-      if (!user.isRegistered) {
-        activeUser = await registerUser();
-      }
+      // Always upsert the user first — backend does upsert so this is safe
+      // and handles stale localStorage IDs (e.g. after a DB wipe on Railway)
+      const activeUser = await registerUser();
+      if (!activeUser?.id) throw new Error('Could not register user. Please try again.');
 
       const result = await createAssessment({ ...formData, userId: activeUser.id });
       if (result?.id) {
         navigate(`/dashboard/${result.id}`);
       }
     } catch (err) {
-      if (err.message?.includes('User not found')) {
-        try {
-          const newUser = resetUser();
-          const registeredUser = await registerUser(newUser.id);
-          const result = await createAssessment({ ...formData, userId: registeredUser.id });
-          if (result?.id) {
-            navigate(`/dashboard/${result.id}`);
-            return;
-          }
-        } catch (retryErr) {
-          setSubmitError(retryErr.message || 'Submission failed. Please try again.');
-          return;
-        }
-      }
       setSubmitError(err.message || 'Submission failed. Please check your connection and try again.');
     }
   };
