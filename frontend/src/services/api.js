@@ -22,11 +22,14 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    const message =
-      error.response?.data?.error ||
-      error.response?.data?.message ||
-      error.message ||
-      'An unexpected error occurred';
+    const data = error.response?.data;
+    let message = data?.error || data?.message || error.message || 'An unexpected error occurred';
+
+    if (data?.details && Array.isArray(data.details)) {
+      const detailsStr = data.details.map((d) => `${d.field}: ${d.message}`).join(', ');
+      message = `${message} (${detailsStr})`;
+    }
+
     return Promise.reject(new Error(message));
   }
 );
