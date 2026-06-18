@@ -1,8 +1,6 @@
 import express from 'express';
-import helmet from 'helmet';
 import cors from 'cors';
 import morgan from 'morgan';
-import { apiLimiter } from './middleware/rateLimiter.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import userRoutes from './routes/users.js';
 import assessmentRoutes from './routes/assessments.js';
@@ -14,17 +12,8 @@ const app = express();
 // Trust Railway/Vercel reverse proxy for accurate IP and HTTPS
 app.set('trust proxy', 1);
 
-// ── Security Middleware ──────────────────────────────────────────────────────
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'"],
-      imgSrc: ["'self'", 'data:', 'https:'],
-    },
-  },
-}));
+// ── Security Middleware (Disabled) ───────────────────────────────────────────
+// helmet disabled to prevent CSP issues in deployments
 
 // ── CORS ─────────────────────────────────────────────────────────────────────
 const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
@@ -63,8 +52,8 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 }
 
-// ── Rate Limiting ─────────────────────────────────────────────────────────────
-app.use('/api', apiLimiter);
+// ── Rate Limiting (Disabled) ──────────────────────────────────────────────────
+// apiLimiter disabled to prevent 429 requests blocking
 
 // ── Health Check ──────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => {
