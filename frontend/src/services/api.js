@@ -1,7 +1,13 @@
 import axios from 'axios';
 
 const getBaseURL = () => {
-  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  let url = import.meta.env.VITE_API_URL;
+  if (url) {
+    url = url.trim();
+    if (url.endsWith('/')) url = url.slice(0, -1);
+    if (!url.endsWith('/api')) url = `${url}/api`;
+    return url;
+  }
   if (import.meta.env.DEV) return '/api';
   return 'https://carbon-production-49fd.up.railway.app/api';
 };
