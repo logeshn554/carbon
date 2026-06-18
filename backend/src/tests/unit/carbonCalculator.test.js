@@ -177,4 +177,53 @@ describe('Carbon Calculator Service', () => {
       expect(Number.isInteger(result.totalEmission)).toBe(true);
     });
   });
+
+  // ── Edge Cases ────────────────────────────────────────────────────────────────
+  describe('Edge Cases', () => {
+    it('zero inputs return zero for transport, energy, shopping', () => {
+      const result = calculateAllEmissions({
+        dailyCarKm: 0, carFuelType: 'none',
+        publicTransportKmPerWeek: 0, cyclingKmPerWeek: 0,
+        shortFlightsPerYear: 0, longFlightsPerYear: 0,
+        monthlyElectricityKwh: 0, renewablePercentage: 0,
+        dietType: 'vegan',
+        clothingItemsPerYear: 0, electronicsItemsPerYear: 0,
+      });
+      expect(result.transportEmission).toBe(0);
+      expect(result.energyEmission).toBe(0);
+      expect(result.shoppingEmission).toBe(0);
+      expect(result.foodEmission).toBe(1500); // vegan diet always has baseline
+    });
+
+    it('unknown carFuelType falls back to 0 emission factor', () => {
+      const result = calculateTransportEmission({ dailyCarKm: 20, carFuelType: 'hydrogen' });
+      expect(result).toBe(0); // unknown type → ?? 0
+    });
+
+    it('unknown dietType falls back to mixed diet emission', () => {
+      const result = calculateFoodEmission({ dietType: 'carnivore' });
+      expect(result).toBe(2500); // fallback to mixed
+    });
+
+    it('very large dailyCarKm does not crash', () => {
+      expect(() =>
+        calculateTransportEmission({ dailyCarKm: 999999, carFuelType: 'petrol' })
+      ).not.toThrow();
+      const result = calculateTransportEmission({ dailyCarKm: 999999, carFuelType: 'petrol' });
+      expect(result).toBeGreaterThan(0);
+      expect(isFinite(result)).toBe(true);
+    });
+
+    it('renewablePercentage clamped to 100 eliminates energy emission', () => {
+      const result = calculateEnergyEmission({ monthlyElectricityKwh: 500, renewablePercentage: 999 });
+      expect(result).toBe(0);
+    });
+
+    it('breakdown percentages are non-negative', () => {
+      const result = calculateAllEmissions({ dietType: 'mixed' });
+      Object.values(result.breakdown).forEach((pct) => {
+        expect(pct).toBeGreaterThanOrEqual(0);
+      });
+    });
+  });
 });

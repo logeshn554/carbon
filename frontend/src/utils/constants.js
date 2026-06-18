@@ -148,3 +148,20 @@ export const SIMULATION_SCENARIOS = [
     params: { shoppingReductionFactor: 0.7 },
   },
 ];
+
+// Privacy notice
+export const PRIVACY_NOTICE =
+  'EcoGuide AI does not collect personal data. All calculations use anonymous session IDs stored only in your browser. No names, emails, or identifying information are required or retained.';
+
+// Input validation limits (mirroring backend Zod schema)
+export const INPUT_LIMITS = {
+  dailyCarKm: { min: 0, max: 1000 },
+  publicTransportKmPerWeek: { min: 0, max: 10000 },
+  cyclingKmPerWeek: { min: 0, max: 1000 },
+  shortFlightsPerYear: { min: 0, max: 100 },
+  longFlightsPerYear: { min: 0, max: 50 },
+  monthlyElectricityKwh: { min: 0, max: 10000 },
+  renewablePercentage: { min: 0, max: 100 },
+  clothingItemsPerYear: { min: 0, max: 500 },
+  electronicsItemsPerYear: { min: 0, max: 50 },
+};

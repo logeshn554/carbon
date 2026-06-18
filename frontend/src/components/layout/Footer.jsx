@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { PRIVACY_NOTICE } from '../../utils/constants';
 
 export default function Footer() {
   return (
@@ -66,6 +67,20 @@ export default function Footer() {
         </div>
 
         <div className="section-divider" />
+
+        {/* Privacy Notice */}
+        <div
+          className="rounded-xl px-4 py-3 mb-6 text-xs leading-relaxed"
+          style={{
+            background: 'rgba(16,185,129,0.04)',
+            border: '1px solid rgba(16,185,129,0.12)',
+            color: '#475569',
+          }}
+          role="note"
+          aria-label="Privacy notice"
+        >
+          🔒 <strong style={{ color: '#6b7280' }}>Privacy:</strong> {PRIVACY_NOTICE}
+        </div>
 
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm" style={{ color: '#333' }}>

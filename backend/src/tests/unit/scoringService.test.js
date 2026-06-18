@@ -111,4 +111,43 @@ describe('Scoring Service', () => {
       expect(result.vsGlobalAverage).toBeGreaterThan(0);
     });
   });
+
+  // ── Boundary Tests ────────────────────────────────────────────────────────────
+  describe('Boundary Values', () => {
+    it('score at exactly Paris target (2000 kg) is 100', () => {
+      expect(calculateScore(2000)).toBe(100);
+    });
+
+    it('score at exactly excellent threshold (3000 kg) is 90', () => {
+      expect(calculateScore(3000)).toBe(90);
+    });
+
+    it('score at exactly good threshold (5000 kg) is 70', () => {
+      expect(calculateScore(5000)).toBe(70);
+    });
+
+    it('score at exactly moderate threshold (7500 kg) is 50', () => {
+      expect(calculateScore(7500)).toBe(50);
+    });
+
+    it('score at exactly poor threshold (12000 kg) is 0', () => {
+      expect(calculateScore(12000)).toBe(0);
+    });
+
+    it('score for 0 emissions is 100', () => {
+      expect(calculateScore(0)).toBe(100);
+    });
+
+    it('score for negative emissions is 100', () => {
+      expect(calculateScore(-500)).toBe(100);
+    });
+
+    it('score is always between 0 and 100', () => {
+      [0, 1000, 2000, 3000, 5000, 7500, 10000, 12000, 20000].forEach((kg) => {
+        const score = calculateScore(kg);
+        expect(score).toBeGreaterThanOrEqual(0);
+        expect(score).toBeLessThanOrEqual(100);
+      });
+    });
+  });
 });

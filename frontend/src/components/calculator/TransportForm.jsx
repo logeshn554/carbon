@@ -1,6 +1,9 @@
+import { memo, useCallback, useMemo } from 'react';
 import Input from '../ui/Input';
 import Select from '../ui/Select';
 import Icon from '../ui/Icons';
+import { sanitizeNumber, sanitizeInteger } from '../../utils/sanitize';
+import { CAR_EMISSION_FACTORS, FLIGHT_FACTORS, INPUT_LIMITS } from '../../utils/constants';
 
 const fuelTypeOptions = [
   { value: 'none', label: "I don't drive / No car" },
@@ -10,10 +13,29 @@ const fuelTypeOptions = [
   { value: 'hybrid', label: 'Hybrid' },
 ];
 
-export default function TransportForm({ data, onChange }) {
-  const handleChange = (field, value) => {
-    onChange({ ...data, [field]: value });
-  };
+/**
+ * TransportForm — step 1 of the carbon calculator.
+ * Collects car usage, public transport, cycling, and flight data.
+ */
+function TransportForm({ data, onChange }) {
+  const handleChange = useCallback(
+    (field, value) => onChange({ ...data, [field]: value }),
+    [data, onChange]
+  );
+
+  // Live preview using constants — no magic numbers
+  const preview = useMemo(() => {
+    const carFactor = CAR_EMISSION_FACTORS[data.carFuelType] ?? 0;
+    return {
+      car: data.dailyCarKm > 0 ? Math.round(data.dailyCarKm * carFactor * 365) : 0,
+      shortFlights: data.shortFlightsPerYear > 0
+        ? data.shortFlightsPerYear * FLIGHT_FACTORS.short_haul : 0,
+      longFlights: data.longFlightsPerYear > 0
+        ? data.longFlightsPerYear * FLIGHT_FACTORS.long_haul : 0,
+    };
+  }, [data.dailyCarKm, data.carFuelType, data.shortFlightsPerYear, data.longFlightsPerYear]);
+
+  const showPreview = preview.car > 0 || preview.shortFlights > 0 || preview.longFlights > 0;
 
   return (
     <fieldset>
@@ -31,11 +53,12 @@ export default function TransportForm({ data, onChange }) {
             id="dailyCarKm"
             label="Daily Car Distance (km)"
             type="number"
-            min="0"
-            max="1000"
+            min={INPUT_LIMITS.dailyCarKm.min}
+            max={INPUT_LIMITS.dailyCarKm.max}
             placeholder="0"
             value={data.dailyCarKm || ''}
-            onChange={(e) => handleChange('dailyCarKm', parseFloat(e.target.value) || 0)}
+            onChange={(e) => handleChange('dailyCarKm',
+              sanitizeNumber(e.target.value, INPUT_LIMITS.dailyCarKm.min, INPUT_LIMITS.dailyCarKm.max))}
             hint={data.carFuelType === 'none' ? "Set to 0 if you don't drive" : 'Average km driven per day'}
           />
         </div>
@@ -45,22 +68,24 @@ export default function TransportForm({ data, onChange }) {
             id="publicTransportKmPerWeek"
             label="Public Transport Distance (km/week)"
             type="number"
-            min="0"
-            max="10000"
+            min={INPUT_LIMITS.publicTransportKmPerWeek.min}
+            max={INPUT_LIMITS.publicTransportKmPerWeek.max}
             placeholder="0"
             value={data.publicTransportKmPerWeek || ''}
-            onChange={(e) => handleChange('publicTransportKmPerWeek', parseFloat(e.target.value) || 0)}
+            onChange={(e) => handleChange('publicTransportKmPerWeek',
+              sanitizeNumber(e.target.value, INPUT_LIMITS.publicTransportKmPerWeek.min, INPUT_LIMITS.publicTransportKmPerWeek.max))}
             hint="Bus, metro, tram — total km per week"
           />
           <Input
             id="cyclingKmPerWeek"
             label="Cycling Distance (km/week)"
             type="number"
-            min="0"
-            max="1000"
+            min={INPUT_LIMITS.cyclingKmPerWeek.min}
+            max={INPUT_LIMITS.cyclingKmPerWeek.max}
             placeholder="0"
             value={data.cyclingKmPerWeek || ''}
-            onChange={(e) => handleChange('cyclingKmPerWeek', parseFloat(e.target.value) || 0)}
+            onChange={(e) => handleChange('cyclingKmPerWeek',
+              sanitizeNumber(e.target.value, INPUT_LIMITS.cyclingKmPerWeek.min, INPUT_LIMITS.cyclingKmPerWeek.max))}
             hint="Cycling produces zero direct emissions"
           />
         </div>
@@ -77,39 +102,43 @@ export default function TransportForm({ data, onChange }) {
               id="shortFlightsPerYear"
               label="Short-haul Flights per Year"
               type="number"
-              min="0"
-              max="100"
+              min={INPUT_LIMITS.shortFlightsPerYear.min}
+              max={INPUT_LIMITS.shortFlightsPerYear.max}
               placeholder="0"
               value={data.shortFlightsPerYear || ''}
-              onChange={(e) => handleChange('shortFlightsPerYear', parseInt(e.target.value) || 0)}
-              hint="Under 3 hours — ~255 kg CO₂ per return flight"
+              onChange={(e) => handleChange('shortFlightsPerYear',
+                sanitizeInteger(e.target.value, INPUT_LIMITS.shortFlightsPerYear.min, INPUT_LIMITS.shortFlightsPerYear.max))}
+              hint={`Under 3 hours — ~${FLIGHT_FACTORS.short_haul} kg CO₂ per return flight`}
             />
             <Input
               id="longFlightsPerYear"
               label="Long-haul Flights per Year"
               type="number"
-              min="0"
-              max="50"
+              min={INPUT_LIMITS.longFlightsPerYear.min}
+              max={INPUT_LIMITS.longFlightsPerYear.max}
               placeholder="0"
               value={data.longFlightsPerYear || ''}
-              onChange={(e) => handleChange('longFlightsPerYear', parseInt(e.target.value) || 0)}
-              hint="Over 3 hours — ~1,620 kg CO₂ per return flight"
+              onChange={(e) => handleChange('longFlightsPerYear',
+                sanitizeInteger(e.target.value, INPUT_LIMITS.longFlightsPerYear.min, INPUT_LIMITS.longFlightsPerYear.max))}
+              hint={`Over 3 hours — ~${FLIGHT_FACTORS.long_haul.toLocaleString()} kg CO₂ per return flight`}
             />
           </div>
         </div>
 
-        {/* Live preview */}
-        {(data.dailyCarKm > 0 || data.shortFlightsPerYear > 0 || data.longFlightsPerYear > 0) && (
+        {/* Live preview — values from constants, no magic numbers */}
+        {showPreview && (
           <div
             className="rounded-xl p-4 flex items-start gap-3 animate-fade-in"
             style={{ border: '1px solid rgba(0,194,123,0.18)', background: 'rgba(0,194,123,0.05)' }}
+            aria-live="polite"
+            aria-atomic="true"
           >
             <Icon name="info" size={15} style={{ color: '#00C27B' }} className="flex-shrink-0 mt-0.5 text-current" />
             <p className="text-sm font-medium" style={{ color: '#00C27B' }}>
               Quick estimate:
-              {data.dailyCarKm > 0 && ` Car: ~${Math.round(data.dailyCarKm * 0.21 * 365)} kg/yr`}
-              {data.shortFlightsPerYear > 0 && ` · Short flights: ~${data.shortFlightsPerYear * 255} kg/yr`}
-              {data.longFlightsPerYear > 0 && ` · Long flights: ~${data.longFlightsPerYear * 1620} kg/yr`}
+              {preview.car > 0 && ` Car: ~${preview.car.toLocaleString()} kg/yr`}
+              {preview.shortFlights > 0 && ` · Short flights: ~${preview.shortFlights.toLocaleString()} kg/yr`}
+              {preview.longFlights > 0 && ` · Long flights: ~${preview.longFlights.toLocaleString()} kg/yr`}
             </p>
           </div>
         )}
@@ -117,3 +146,5 @@ export default function TransportForm({ data, onChange }) {
     </fieldset>
   );
 }
+
+export default memo(TransportForm);

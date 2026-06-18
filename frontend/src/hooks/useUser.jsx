@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { userService } from '../services/userService';
+import logger from '../utils/logger';
 
 const UserContext = createContext(null);
 
@@ -43,7 +44,7 @@ export function UserProvider({ children }) {
       setUser(updatedUser);
       return updatedUser;
     } catch (err) {
-      console.error('Failed to register anonymous user on backend:', err);
+      logger.error('Failed to register anonymous user on backend:', err);
       throw err;
     }
   };

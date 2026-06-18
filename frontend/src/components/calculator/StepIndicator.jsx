@@ -1,4 +1,10 @@
-export default function StepIndicator({ steps, currentStep }) {
+import { memo } from 'react';
+
+/**
+ * StepIndicator — displays progress through the calculator steps.
+ * Wrapped in React.memo to prevent re-renders when parent re-renders for unrelated reasons.
+ */
+function StepIndicator({ steps, currentStep }) {
   return (
     <nav aria-label="Form progress" className="mb-8">
       <ol className="flex items-center justify-between" role="list">
@@ -28,10 +34,7 @@ export default function StepIndicator({ steps, currentStep }) {
                   aria-current={isActive ? 'step' : undefined}
                 >
                   {isComplete ? (
-                    <span
-                      className="text-xs font-bold text-[#10B981]"
-                      aria-label="Completed"
-                    >
+                    <span className="text-xs font-bold text-[#10B981]" aria-label="Completed">
                       ✓
                     </span>
                   ) : (
@@ -64,9 +67,7 @@ export default function StepIndicator({ steps, currentStep }) {
                   <div
                     className="h-px transition-all duration-500 rounded-full"
                     style={{
-                      background: index < currentStep
-                        ? '#10B981'
-                        : 'rgba(255,255,255,0.07)',
+                      background: index < currentStep ? '#10B981' : 'rgba(255,255,255,0.07)',
                     }}
                     aria-hidden="true"
                   />
@@ -79,3 +80,5 @@ export default function StepIndicator({ steps, currentStep }) {
     </nav>
   );
 }
+
+export default memo(StepIndicator);

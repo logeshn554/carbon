@@ -1,5 +1,8 @@
+import { memo, useCallback, useMemo } from 'react';
 import Input from '../ui/Input';
 import Icon from '../ui/Icons';
+import { sanitizeInteger } from '../../utils/sanitize';
+import { CLOTHING_FACTOR, ELECTRONICS_FACTOR, INPUT_LIMITS } from '../../utils/constants';
 
 const tips = [
   { icon: 'recycle', title: 'Second-Hand', desc: 'Buying second-hand reduces emissions by 60–80%' },
@@ -7,13 +10,25 @@ const tips = [
   { icon: 'minus_circle', title: 'Buy Less', desc: 'The most sustainable product is one not made' },
 ];
 
-export default function ShoppingForm({ data, onChange }) {
-  const handleChange = (field, value) => {
-    onChange({ ...data, [field]: value });
-  };
+/**
+ * ShoppingForm — step 4 of the carbon calculator.
+ * Collects clothing and electronics purchasing data.
+ */
+function ShoppingForm({ data, onChange }) {
+  const handleChange = useCallback(
+    (field, value) => onChange({ ...data, [field]: value }),
+    [data, onChange]
+  );
 
-  const clothingEmission = (data.clothingItemsPerYear || 0) * 33;
-  const electronicsEmission = (data.electronicsItemsPerYear || 0) * 300;
+  // Memoized emission previews using CLOTHING_FACTOR and ELECTRONICS_FACTOR constants
+  const clothingEmission = useMemo(
+    () => (data.clothingItemsPerYear || 0) * CLOTHING_FACTOR,
+    [data.clothingItemsPerYear]
+  );
+  const electronicsEmission = useMemo(
+    () => (data.electronicsItemsPerYear || 0) * ELECTRONICS_FACTOR,
+    [data.electronicsItemsPerYear]
+  );
   const totalShoppingEmission = clothingEmission + electronicsEmission;
 
   return (
@@ -31,12 +46,13 @@ export default function ShoppingForm({ data, onChange }) {
               id="clothingItemsPerYear"
               label="New Clothing Items per Year"
               type="number"
-              min="0"
-              max="500"
+              min={INPUT_LIMITS.clothingItemsPerYear.min}
+              max={INPUT_LIMITS.clothingItemsPerYear.max}
               placeholder="0"
               value={data.clothingItemsPerYear || ''}
-              onChange={(e) => handleChange('clothingItemsPerYear', parseInt(e.target.value) || 0)}
-              hint="Include shoes, accessories, etc. ~33 kg CO₂ per item"
+              onChange={(e) => handleChange('clothingItemsPerYear',
+                sanitizeInteger(e.target.value, INPUT_LIMITS.clothingItemsPerYear.min, INPUT_LIMITS.clothingItemsPerYear.max))}
+              hint={`Include shoes, accessories, etc. ~${CLOTHING_FACTOR} kg CO₂ per item`}
             />
             {data.clothingItemsPerYear > 0 && (
               <p className="mt-1.5 text-xs" style={{ color: '#fbbf24' }}>
@@ -50,12 +66,13 @@ export default function ShoppingForm({ data, onChange }) {
               id="electronicsItemsPerYear"
               label="New Electronic Devices per Year"
               type="number"
-              min="0"
-              max="50"
+              min={INPUT_LIMITS.electronicsItemsPerYear.min}
+              max={INPUT_LIMITS.electronicsItemsPerYear.max}
               placeholder="0"
               value={data.electronicsItemsPerYear || ''}
-              onChange={(e) => handleChange('electronicsItemsPerYear', parseInt(e.target.value) || 0)}
-              hint="Smartphones, laptops, tablets, etc. ~300 kg CO₂ per device"
+              onChange={(e) => handleChange('electronicsItemsPerYear',
+                sanitizeInteger(e.target.value, INPUT_LIMITS.electronicsItemsPerYear.min, INPUT_LIMITS.electronicsItemsPerYear.max))}
+              hint={`Smartphones, laptops, tablets, etc. ~${ELECTRONICS_FACTOR} kg CO₂ per device`}
             />
             {data.electronicsItemsPerYear > 0 && (
               <p className="mt-1.5 text-xs" style={{ color: '#fbbf24' }}>
@@ -96,6 +113,8 @@ export default function ShoppingForm({ data, onChange }) {
           <div
             className="rounded-xl p-4 flex items-start gap-3 animate-fade-in"
             style={{ border: '1px solid rgba(245,158,11,0.18)', background: 'rgba(245,158,11,0.05)' }}
+            aria-live="polite"
+            aria-atomic="true"
           >
             <Icon name="shopping" size={15} style={{ color: '#fbbf24' }} className="flex-shrink-0 mt-0.5 text-current" />
             <p className="text-sm font-medium" style={{ color: '#fbbf24' }}>
@@ -107,3 +126,5 @@ export default function ShoppingForm({ data, onChange }) {
     </fieldset>
   );
 }
+
+export default memo(ShoppingForm);

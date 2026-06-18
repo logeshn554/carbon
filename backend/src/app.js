@@ -1,7 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import helmet from 'helmet';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
+import { apiLimiter } from './middleware/rateLimiter.js';
 import userRoutes from './routes/users.js';
 import assessmentRoutes from './routes/assessments.js';
 import recommendationRoutes from './routes/recommendations.js';
@@ -12,31 +14,48 @@ const app = express();
 // Trust Railway/Vercel reverse proxy for accurate IP and HTTPS
 app.set('trust proxy', 1);
 
-// ── Security Middleware (Disabled) ───────────────────────────────────────────
-// helmet disabled to prevent CSP issues in deployments
+// ── Security Headers (Helmet) ─────────────────────────────────────────────────
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", 'https://fonts.googleapis.com', "'unsafe-inline'"],
+        fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+        connectSrc: [
+          "'self'",
+          'https://carbon-production-49fd.up.railway.app',
+          '*.vercel.app',
+          'http://localhost:*',
+        ],
+        imgSrc: ["'self'", 'data:'],
+        objectSrc: ["'none'"],
+        frameSrc: ["'none'"],
+        upgradeInsecureRequests: [],
+      },
+    },
+    hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
+    noSniff: true,
+    xssFilter: true,
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+    permittedCrossDomainPolicies: false,
+    frameguard: { action: 'deny' },
+  })
+);
 
 // ── CORS ─────────────────────────────────────────────────────────────────────
 const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
 const corsOrigins = corsOrigin.split(',').map((o) => o.trim()).filter(Boolean);
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-
-    // Allow local development origin
     if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
       return callback(null, true);
     }
-
-    // Check if origin matches any allowed origin or is a Vercel deployment
     const isAllowed = corsOrigins.some((allowed) => origin === allowed) ||
                       origin.endsWith('.vercel.app');
-
-    if (isAllowed) {
-      callback(null, true);
-    } else {
-      callback(null, false);
-    }
+    callback(null, isAllowed);
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -44,16 +63,16 @@ app.use(cors({
 }));
 
 // ── Body Parsing ──────────────────────────────────────────────────────────────
-app.use(express.json({ limit: '1mb' }));
-app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+app.use(express.json({ limit: '100kb' }));
+app.use(express.urlencoded({ extended: true, limit: '100kb' }));
 
 // ── Logging ───────────────────────────────────────────────────────────────────
 if (process.env.NODE_ENV !== 'test') {
   app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 }
 
-// ── Rate Limiting (Disabled) ──────────────────────────────────────────────────
-// apiLimiter disabled to prevent 429 requests blocking
+// ── Rate Limiting ─────────────────────────────────────────────────────────────
+app.use('/api/', apiLimiter);
 
 // ── Health Check ──────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => {

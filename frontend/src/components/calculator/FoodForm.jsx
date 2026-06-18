@@ -1,3 +1,4 @@
+import { memo, useCallback } from 'react';
 import Icon from '../ui/Icons';
 
 const dietOptions = [
@@ -7,7 +8,6 @@ const dietOptions = [
     description: 'Entirely plant-based diet',
     emission: '1,500 kg/year',
     emissionNum: 1500,
-    color: 'emerald',
     border: 'rgba(0,194,123,0.45)',
     bg: 'rgba(0,194,123,0.08)',
     textColor: '#00C27B',
@@ -18,7 +18,6 @@ const dietOptions = [
     description: 'Plant-based with dairy & eggs',
     emission: '1,700 kg/year',
     emissionNum: 1700,
-    color: 'green',
     border: 'rgba(34,197,94,0.45)',
     bg: 'rgba(34,197,94,0.08)',
     textColor: '#4ade80',
@@ -29,7 +28,6 @@ const dietOptions = [
     description: 'Occasional meat & fish',
     emission: '2,500 kg/year',
     emissionNum: 2500,
-    color: 'amber',
     border: 'rgba(245,158,11,0.45)',
     bg: 'rgba(245,158,11,0.08)',
     textColor: '#fbbf24',
@@ -40,17 +38,23 @@ const dietOptions = [
     description: 'Meat at most meals',
     emission: '3,300 kg/year',
     emissionNum: 3300,
-    color: 'rose',
     border: 'rgba(244,63,94,0.45)',
     bg: 'rgba(244,63,94,0.08)',
     textColor: '#fb7185',
   },
 ];
 
-export default function FoodForm({ data, onChange }) {
-  const handleDietChange = (value) => {
-    onChange({ ...data, dietType: value });
-  };
+const MAX_EMISSION = 3300;
+
+/**
+ * FoodForm — step 3 of the carbon calculator.
+ * Collects diet type via accessible radio button group.
+ */
+function FoodForm({ data, onChange }) {
+  const handleDietChange = useCallback(
+    (value) => onChange({ ...data, dietType: value }),
+    [data, onChange]
+  );
 
   return (
     <fieldset>
@@ -74,12 +78,20 @@ export default function FoodForm({ data, onChange }) {
                 type="button"
                 role="radio"
                 aria-checked={isSelected}
+                tabIndex={0}
                 onClick={() => handleDietChange(option.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleDietChange(option.value);
+                  }
+                }}
                 className="text-left p-4 rounded-xl transition-all duration-200"
                 style={{
                   border: `1px solid ${isSelected ? option.border : 'rgba(255,255,255,0.07)'}`,
                   background: isSelected ? option.bg : 'rgba(255,255,255,0.025)',
                   transform: isSelected ? 'scale(1.02)' : 'scale(1)',
+                  outline: 'none',
                 }}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -126,8 +138,7 @@ export default function FoodForm({ data, onChange }) {
             Annual CO₂ Comparison
           </p>
           {dietOptions.map((option) => {
-            const maxEmission = 3300;
-            const percentage = (option.emissionNum / maxEmission) * 100;
+            const percentage = (option.emissionNum / MAX_EMISSION) * 100;
             const isSelected = data.dietType === option.value;
             return (
               <div key={option.value} className="flex items-center gap-3 mb-2">
@@ -155,3 +166,5 @@ export default function FoodForm({ data, onChange }) {
     </fieldset>
   );
 }
+
+export default memo(FoodForm);

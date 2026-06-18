@@ -81,12 +81,14 @@ describe('Assessment API Integration Tests', () => {
       expect(res.body.success).toBe(false);
     });
 
-    it('should return 404 for non-existent userId', async () => {
+    it('should auto-create user and succeed (201) for a non-existent userId', async () => {
       const res = await request(app)
         .post('/api/assessments')
         .send({ ...validAssessmentData, userId: 'nonexistent-id' });
 
-      expect(res.status).toBe(404);
+      // Auto-upsert creates the user on-the-fly — 201 is expected
+      expect(res.status).toBe(201);
+      expect(res.body.success).toBe(true);
     });
 
     it('should return 400 for invalid fuel type', async () => {

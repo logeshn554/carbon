@@ -1,5 +1,8 @@
+import { memo, useCallback, useMemo } from 'react';
 import Input from '../ui/Input';
 import Icon from '../ui/Icons';
+import { sanitizeNumber, sanitizeInteger } from '../../utils/sanitize';
+import { ELECTRICITY_GRID_FACTOR, INPUT_LIMITS } from '../../utils/constants';
 
 const energyFacts = [
   { icon: 'plug', label: 'Grid Average', value: '0.233 kg CO₂/kWh', color: '#F59E0B' },
@@ -7,14 +10,30 @@ const energyFacts = [
   { icon: 'wind', label: 'Wind Power', value: '~0.01 kg CO₂/kWh', color: '#7aadfa' },
 ];
 
-export default function EnergyForm({ data, onChange }) {
-  const handleChange = (field, value) => {
-    onChange({ ...data, [field]: value });
-  };
+/**
+ * EnergyForm — step 2 of the carbon calculator.
+ * Collects monthly electricity usage and renewable energy percentage.
+ */
+function EnergyForm({ data, onChange }) {
+  const handleChange = useCallback(
+    (field, value) => onChange({ ...data, [field]: value }),
+    [data, onChange]
+  );
 
-  const nonRenewableEmission = data.monthlyElectricityKwh
-    ? Math.round(data.monthlyElectricityKwh * 12 * 0.233 * (1 - (data.renewablePercentage || 0) / 100))
-    : 0;
+  // Memoized emission preview using ELECTRICITY_GRID_FACTOR constant
+  const nonRenewableEmission = useMemo(() => {
+    if (!data.monthlyElectricityKwh) return 0;
+    const renewable = sanitizeInteger(data.renewablePercentage || 0, 0, 100);
+    return Math.round(
+      data.monthlyElectricityKwh * 12 * ELECTRICITY_GRID_FACTOR * (1 - renewable / 100)
+    );
+  }, [data.monthlyElectricityKwh, data.renewablePercentage]);
+
+  const renewableSavings = useMemo(() => {
+    if (!data.monthlyElectricityKwh || !data.renewablePercentage) return 0;
+    const renewable = sanitizeInteger(data.renewablePercentage, 0, 100);
+    return Math.round(data.monthlyElectricityKwh * 12 * ELECTRICITY_GRID_FACTOR * (renewable / 100));
+  }, [data.monthlyElectricityKwh, data.renewablePercentage]);
 
   return (
     <fieldset>
@@ -25,11 +44,12 @@ export default function EnergyForm({ data, onChange }) {
             id="monthlyElectricityKwh"
             label="Monthly Electricity Usage (kWh)"
             type="number"
-            min="0"
-            max="10000"
+            min={INPUT_LIMITS.monthlyElectricityKwh.min}
+            max={INPUT_LIMITS.monthlyElectricityKwh.max}
             placeholder="200"
             value={data.monthlyElectricityKwh || ''}
-            onChange={(e) => handleChange('monthlyElectricityKwh', parseFloat(e.target.value) || 0)}
+            onChange={(e) => handleChange('monthlyElectricityKwh',
+              sanitizeNumber(e.target.value, INPUT_LIMITS.monthlyElectricityKwh.min, INPUT_LIMITS.monthlyElectricityKwh.max))}
             hint="Check your electricity bill for kWh usage. UK avg: ~280 kWh/month"
           />
           <div>
@@ -39,11 +59,12 @@ export default function EnergyForm({ data, onChange }) {
             <input
               id="renewablePercentage"
               type="range"
-              min="0"
-              max="100"
+              min={INPUT_LIMITS.renewablePercentage.min}
+              max={INPUT_LIMITS.renewablePercentage.max}
               step="5"
               value={data.renewablePercentage || 0}
-              onChange={(e) => handleChange('renewablePercentage', parseInt(e.target.value))}
+              onChange={(e) => handleChange('renewablePercentage',
+                sanitizeInteger(e.target.value, INPUT_LIMITS.renewablePercentage.min, INPUT_LIMITS.renewablePercentage.max))}
               className="w-full mt-2"
               aria-valuemin={0}
               aria-valuemax={100}
@@ -88,6 +109,8 @@ export default function EnergyForm({ data, onChange }) {
           <div
             className="rounded-xl p-4 flex items-start gap-3 animate-fade-in"
             style={{ border: '1px solid rgba(79,142,247,0.18)', background: 'rgba(79,142,247,0.05)' }}
+            aria-live="polite"
+            aria-atomic="true"
           >
             <Icon name="info" size={15} style={{ color: '#4F8EF7' }} className="flex-shrink-0 mt-0.5 text-current" />
             <p className="text-sm font-medium" style={{ color: '#7aadfa' }}>
@@ -95,7 +118,7 @@ export default function EnergyForm({ data, onChange }) {
               {data.renewablePercentage > 0 && (
                 <span style={{ color: '#00C27B' }}>
                   {' '}({data.renewablePercentage}% renewable saves{' '}
-                  {Math.round(data.monthlyElectricityKwh * 12 * 0.233 * (data.renewablePercentage / 100)).toLocaleString()} kg)
+                  {renewableSavings.toLocaleString()} kg)
                 </span>
               )}
             </p>
@@ -105,3 +128,5 @@ export default function EnergyForm({ data, onChange }) {
     </fieldset>
   );
 }
+
+export default memo(EnergyForm);
