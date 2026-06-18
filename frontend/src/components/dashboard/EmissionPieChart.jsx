@@ -83,7 +83,7 @@ export default function EmissionPieChart({ assessment }) {
               {data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
+                  fill={CATEGORY_COLORS[entry.key]}
                   stroke="rgba(0,0,0,0.3)"
                   strokeWidth={2}
                 />

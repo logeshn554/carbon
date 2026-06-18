@@ -14,23 +14,22 @@ export default function StepIndicator({ steps, currentStep }) {
                   className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300"
                   style={{
                     background: isComplete
-                      ? 'rgba(255,255,255,0.12)'
+                      ? 'rgba(16, 185, 129, 0.15)'
                       : isActive
-                      ? '#FFFFFF'
+                      ? '#10B981'
                       : 'transparent',
                     border: isComplete
-                      ? '1px solid rgba(255,255,255,0.25)'
+                      ? '1px solid rgba(16, 185, 129, 0.4)'
                       : isActive
                       ? 'none'
-                      : '1px solid rgba(255,255,255,0.1)',
-                    boxShadow: isActive ? '0 0 20px rgba(255,255,255,0.2)' : 'none',
+                      : '1px solid rgba(255,255,255,0.08)',
+                    boxShadow: isActive ? '0 0 20px rgba(16, 185, 129, 0.35)' : 'none',
                   }}
                   aria-current={isActive ? 'step' : undefined}
                 >
                   {isComplete ? (
                     <span
-                      className="text-xs font-bold"
-                      style={{ color: 'rgba(255,255,255,0.6)' }}
+                      className="text-xs font-bold text-[#10B981]"
                       aria-label="Completed"
                     >
                       ✓
@@ -46,14 +45,14 @@ export default function StepIndicator({ steps, currentStep }) {
                 </div>
                 <div className="mt-2 text-center hidden sm:block">
                   <p
-                    className="text-xs font-medium transition-colors"
+                    className="text-xs font-semibold transition-colors"
                     style={{
-                      color: isActive ? '#fff' : isComplete ? '#555' : '#333',
+                      color: isActive ? '#10B981' : isComplete ? '#059669' : '#475569',
                     }}
                   >
                     {step.label}
                   </p>
-                  <p className="text-xs hidden md:block" style={{ color: '#333' }}>
+                  <p className="text-[10px] hidden md:block mt-0.5" style={{ color: '#475569' }}>
                     {step.sublabel}
                   </p>
                 </div>
@@ -66,7 +65,7 @@ export default function StepIndicator({ steps, currentStep }) {
                     className="h-px transition-all duration-500 rounded-full"
                     style={{
                       background: index < currentStep
-                        ? 'rgba(255,255,255,0.3)'
+                        ? '#10B981'
                         : 'rgba(255,255,255,0.07)',
                     }}
                     aria-hidden="true"

@@ -6,21 +6,21 @@
 
 @layer base {
   :root {
-    --color-bg: #000000;
-    --color-surface: #0A0A0A;
-    --color-surface-2: #111111;
-    --color-surface-3: #1A1A1A;
-    --color-border: rgba(255, 255, 255, 0.08);
-    --color-border-strong: rgba(255, 255, 255, 0.18);
-    --color-text: #FFFFFF;
-    --color-text-muted: #888888;
-    --color-text-faint: #444444;
-    --color-accent: #FFFFFF;
-    --color-accent-dim: rgba(255, 255, 255, 0.06);
-    /* score colors stay visible for data */
-    --color-good: #FFFFFF;
-    --color-warn: #BBBBBB;
-    --color-danger: #777777;
+    --color-bg: #040815;
+    --color-surface: #0b1123;
+    --color-surface-2: #141c33;
+    --color-surface-3: #1e284a;
+    --color-border: rgba(255, 255, 255, 0.06);
+    --color-border-strong: rgba(255, 255, 255, 0.14);
+    --color-text: #F8FAFC;
+    --color-text-muted: #94A3B8;
+    --color-text-faint: #475569;
+    --color-accent: #10B981;
+    --color-accent-dim: rgba(16, 185, 129, 0.1);
+    /* score colors */
+    --color-good: #10B981;
+    --color-warn: #F59E0B;
+    --color-danger: #EF4444;
   }
 
   * {
@@ -80,14 +80,14 @@
 
   /* ── Typography ── */
   .gradient-text {
-    background: linear-gradient(135deg, #FFFFFF 0%, #888888 100%);
+    background: linear-gradient(135deg, #10B981 0%, #06B6D4 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .gradient-text-warm {
-    background: linear-gradient(135deg, #FFFFFF, #555555);
+    background: linear-gradient(135deg, #F59E0B 0%, #EF4444 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -104,10 +104,10 @@
   .btn-primary {
     @apply relative overflow-hidden inline-flex items-center justify-center gap-2;
     @apply px-6 py-3 rounded-xl font-semibold transition-all duration-200;
-    background: #FFFFFF;
-    color: #000000;
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    color: #FFFFFF;
     font-size: 0.9375rem;
-    box-shadow: 0 4px 20px rgba(255,255,255,0.12);
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.25);
   }
 
   .btn-primary::after {
@@ -123,7 +123,7 @@
   .btn-primary:hover::after { opacity: 1; }
   .btn-primary:hover {
     transform: translateY(-1px);
-    box-shadow: 0 8px 30px rgba(255,255,255,0.2);
+    box-shadow: 0 8px 30px rgba(16, 185, 129, 0.45);
   }
   .btn-primary:active { transform: translateY(0); }
 

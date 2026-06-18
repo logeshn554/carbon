@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import StepIndicator from '../components/calculator/StepIndicator';
 import TransportForm from '../components/calculator/TransportForm';
@@ -30,6 +30,52 @@ const DEFAULT_DATA = {
   clothingItemsPerYear: 0,
   electronicsItemsPerYear: 0,
 };
+
+function LoadingSequence() {
+  const phrases = [
+    'Parsing travel and flight details...',
+    'Calculating home electricity consumption...',
+    'Quantifying diet and food emissions...',
+    'Evaluating consumer shopping patterns...',
+    'Processing IPCC emission factors...',
+    'Invoking AI recommendation engine...',
+    'Optimizing simulation presets...',
+    'Finalizing carbon score...'
+  ];
+
+  const [currentIdx, setCurrentIdx] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIdx((prev) => (prev < phrases.length - 1 ? prev + 1 : prev));
+    }, 700);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="space-y-4 py-4">
+      <p className="text-sm font-mono text-emerald-400 h-6 transition-all duration-300">
+        {phrases[currentIdx]}
+      </p>
+      <div className="flex justify-center gap-1.5">
+        {phrases.map((_, i) => (
+          <div
+            key={i}
+            className="w-2 h-2 rounded-full transition-all duration-300"
+            style={{
+              background: i === currentIdx
+                ? '#10B981'
+                : i < currentIdx
+                ? '#059669'
+                : 'rgba(255,255,255,0.05)',
+              transform: i === currentIdx ? 'scale(1.25)' : 'scale(1)'
+            }}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function CalculatorPage() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -101,6 +147,55 @@ export default function CalculatorPage() {
   const isLastStep = currentStep === STEPS.length - 1;
   const progress = ((currentStep + 1) / STEPS.length) * 100;
 
+  if (loading) {
+    return (
+      <div className="min-h-[75vh] flex items-center justify-center px-4 animate-fade-in">
+        <Card className="max-w-md w-full p-8 text-center relative overflow-hidden scan-line" style={{ borderColor: 'rgba(16, 185, 129, 0.2)' }}>
+          {/* Style injection for progress bar keyframe */}
+          <style dangerouslySetInnerHTML={{__html: `
+            @keyframes progressFill {
+              from { width: 0%; }
+              to { width: 98%; }
+            }
+          `}} />
+
+          {/* Glow effect */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full blur-3xl opacity-20 pointer-events-none" style={{ background: 'radial-gradient(circle, #10B981 0%, transparent 70%)' }} />
+
+          {/* Circular radar scanner */}
+          <div className="relative w-28 h-28 mx-auto mb-6 flex items-center justify-center">
+            <div className="absolute inset-0 rounded-full border border-dashed border-[#10B981]/30 animate-spin" style={{ animationDuration: '8s' }} />
+            <div className="absolute inset-2 rounded-full border border-dashed border-[#06B6D4]/40 animate-spin" style={{ animationDuration: '4s', animationDirection: 'reverse' }} />
+            <div className="absolute inset-4 rounded-full border border-[#10B981]/15" />
+
+            {/* Center icon */}
+            <div className="absolute w-12 h-12 rounded-xl flex items-center justify-center bg-emerald-500/10 text-[#10B981] border border-emerald-500/20 animate-pulse">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              </svg>
+            </div>
+          </div>
+
+          <h2 className="text-2xl font-bold mb-3 text-white" style={{ fontFamily: 'Syne, sans-serif' }}>
+            Calculating Footprint
+          </h2>
+
+          <LoadingSequence />
+
+          <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden mt-6 relative border border-white/5">
+            <div
+              className="h-full bg-gradient-to-r from-[#10B981] to-[#06B6D4] rounded-full"
+              style={{
+                animation: 'progressFill 5.6s cubic-bezier(0.1, 0.8, 0.1, 1) forwards',
+                width: '0%'
+              }}
+            />
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen py-10 px-4">
       <div className="max-w-2xl mx-auto">
@@ -130,10 +225,10 @@ export default function CalculatorPage() {
                 {Math.round(progress)}% complete
               </span>
             </div>
-            <div className="h-px" style={{ background: 'rgba(255,255,255,0.06)' }}>
+            <div className="h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
               <div
-                className="h-full transition-all duration-500"
-                style={{ width: `${progress}%`, background: '#fff' }}
+                className="h-full transition-all duration-500 bg-gradient-to-r from-[#10B981] to-[#06B6D4]"
+                style={{ width: `${progress}%` }}
               />
             </div>
           </div>
