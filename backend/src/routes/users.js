@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { createUser, getUserById } from '../controllers/userController.js';
-import { createLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
 
@@ -9,7 +8,7 @@ const router = Router();
  * @desc    Create or find a user by email (upsert)
  * @access  Public
  */
-router.post('/', createLimiter, createUser);
+router.post('/', createUser);
 
 /**
  * @route   GET /api/users/:id

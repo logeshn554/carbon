@@ -1,13 +1,10 @@
 import axios from 'axios';
 
+// VITE_API_URL should be the full base API URL, e.g.:
+//   https://carbon-production-49fd.up.railway.app/api
 const getBaseURL = () => {
-  let url = import.meta.env.VITE_API_URL;
-  if (url) {
-    url = url.trim();
-    if (url.endsWith('/')) url = url.slice(0, -1);
-    if (!url.endsWith('/api')) url = `${url}/api`;
-    return url;
-  }
+  const url = import.meta.env.VITE_API_URL;
+  if (url) return url.trim().replace(/\/$/, ''); // strip trailing slash if any
   if (import.meta.env.DEV) return '/api';
   return 'https://carbon-production-49fd.up.railway.app/api';
 };
