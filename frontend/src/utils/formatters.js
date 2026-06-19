@@ -110,10 +110,37 @@ export const percentChange = (original, updated) => {
  * @returns {{ label: string, color: string, bgClass: string, textClass: string }}
  */
 export const getScoreInfo = (score) => {
-  if (score >= 90) return { label: 'Excellent', color: '#10b981', bgClass: 'bg-emerald-500/20', textClass: 'text-emerald-400', borderClass: 'border-emerald-500/30' };
-  if (score >= 70) return { label: 'Good', color: '#06b6d4', bgClass: 'bg-cyan-500/20', textClass: 'text-cyan-400', borderClass: 'border-cyan-500/30' };
-  if (score >= 50) return { label: 'Moderate', color: '#f59e0b', bgClass: 'bg-amber-500/20', textClass: 'text-amber-400', borderClass: 'border-amber-500/30' };
-  return { label: 'Needs Improvement', color: '#ef4444', bgClass: 'bg-rose-500/20', textClass: 'text-rose-400', borderClass: 'border-rose-500/30' };
+  if (score >= 90)
+    return {
+      label: 'Excellent',
+      color: '#10b981',
+      bgClass: 'bg-emerald-500/20',
+      textClass: 'text-emerald-400',
+      borderClass: 'border-emerald-500/30',
+    };
+  if (score >= 70)
+    return {
+      label: 'Good',
+      color: '#06b6d4',
+      bgClass: 'bg-cyan-500/20',
+      textClass: 'text-cyan-400',
+      borderClass: 'border-cyan-500/30',
+    };
+  if (score >= 50)
+    return {
+      label: 'Moderate',
+      color: '#f59e0b',
+      bgClass: 'bg-amber-500/20',
+      textClass: 'text-amber-400',
+      borderClass: 'border-amber-500/30',
+    };
+  return {
+    label: 'Needs Improvement',
+    color: '#ef4444',
+    bgClass: 'bg-rose-500/20',
+    textClass: 'text-rose-400',
+    borderClass: 'border-rose-500/30',
+  };
 };
 
 /**
@@ -123,12 +150,32 @@ export const getScoreInfo = (score) => {
 export const getPriorityInfo = (priority) => {
   switch (priority?.toUpperCase()) {
     case 'HIGH':
-      return { label: 'High Priority', bgClass: 'bg-rose-500/20', textClass: 'text-rose-400', borderClass: 'border-rose-500/30' };
+      return {
+        label: 'High Priority',
+        bgClass: 'bg-rose-500/20',
+        textClass: 'text-rose-400',
+        borderClass: 'border-rose-500/30',
+      };
     case 'MEDIUM':
-      return { label: 'Medium Priority', bgClass: 'bg-amber-500/20', textClass: 'text-amber-400', borderClass: 'border-amber-500/30' };
+      return {
+        label: 'Medium Priority',
+        bgClass: 'bg-amber-500/20',
+        textClass: 'text-amber-400',
+        borderClass: 'border-amber-500/30',
+      };
     case 'LOW':
-      return { label: 'Low Priority', bgClass: 'bg-sky-500/20', textClass: 'text-sky-400', borderClass: 'border-sky-500/30' };
+      return {
+        label: 'Low Priority',
+        bgClass: 'bg-sky-500/20',
+        textClass: 'text-sky-400',
+        borderClass: 'border-sky-500/30',
+      };
     default:
-      return { label: priority, bgClass: 'bg-slate-500/20', textClass: 'text-slate-400', borderClass: 'border-slate-500/30' };
+      return {
+        label: priority,
+        bgClass: 'bg-slate-500/20',
+        textClass: 'text-slate-400',
+        borderClass: 'border-slate-500/30',
+      };
   }
 };

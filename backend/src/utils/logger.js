@@ -5,13 +5,6 @@
 
 const isDev = process.env.NODE_ENV !== 'production';
 
-const levels = {
-  error: 0,
-  warn: 1,
-  info: 2,
-  debug: 3,
-};
-
 function formatMessage(level, message, meta = {}) {
   if (isDev) {
     const timestamp = new Date().toISOString();

@@ -4,8 +4,10 @@ import PropTypes from 'prop-types';
 const variants = {
   primary: 'btn-primary',
   secondary: 'btn-secondary',
-  danger: 'px-6 py-3 rounded-xl font-semibold transition-all duration-300 bg-rose-500/20 border border-rose-500/30 text-rose-400 hover:bg-rose-500/30',
-  ghost: 'px-6 py-3 rounded-xl font-semibold transition-all duration-300 text-slate-400 hover:text-slate-200 hover:bg-white/5',
+  danger:
+    'px-6 py-3 rounded-xl font-semibold transition-all duration-300 bg-rose-500/20 border border-rose-500/30 text-rose-400 hover:bg-rose-500/30',
+  ghost:
+    'px-6 py-3 rounded-xl font-semibold transition-all duration-300 text-slate-400 hover:text-slate-200 hover:bg-white/5',
 };
 
 const sizes = {
@@ -66,7 +68,14 @@ const Button = forwardRef(function Button(
           viewBox="0 0 24 24"
           aria-hidden="true"
         >
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          />
           <path
             className="opacity-75"
             fill="currentColor"

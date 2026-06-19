@@ -35,14 +35,18 @@ export default function HistoryPage() {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-4">
         <div className="text-center max-w-md">
-          <p className="text-xs font-mono mb-4" style={{ color: '#333', letterSpacing: '0.1em' }}>NO DATA</p>
+          <p className="text-xs font-mono mb-4" style={{ color: '#333', letterSpacing: '0.1em' }}>
+            NO DATA
+          </p>
           <h1 className="text-2xl font-bold mb-3" style={{ fontFamily: 'Syne, sans-serif' }}>
             No Assessments Yet
           </h1>
           <p className="mb-6" style={{ color: '#555' }}>
             Complete your first carbon footprint assessment to start tracking your progress.
           </p>
-          <Link to="/calculator"><Button>Start First Assessment</Button></Link>
+          <Link to="/calculator">
+            <Button>Start First Assessment</Button>
+          </Link>
         </div>
       </div>
     );
@@ -57,7 +61,6 @@ export default function HistoryPage() {
   return (
     <div className="min-h-screen py-10 px-4">
       <div className="max-w-5xl mx-auto">
-
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
@@ -74,7 +77,10 @@ export default function HistoryPage() {
         {/* Summary cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
           <div className="glass-card p-6 text-center">
-            <p className="text-xs font-mono uppercase tracking-widest mb-3" style={{ color: '#444' }}>
+            <p
+              className="text-xs font-mono uppercase tracking-widest mb-3"
+              style={{ color: '#444' }}
+            >
               Total Assessments
             </p>
             <p className="text-4xl font-bold ticker" style={{ fontFamily: 'Syne, sans-serif' }}>
@@ -82,12 +88,17 @@ export default function HistoryPage() {
             </p>
           </div>
           <div className="glass-card p-6 text-center">
-            <p className="text-xs font-mono uppercase tracking-widest mb-3" style={{ color: '#444' }}>
+            <p
+              className="text-xs font-mono uppercase tracking-widest mb-3"
+              style={{ color: '#444' }}
+            >
               Latest Score
             </p>
             <p className="text-4xl font-bold ticker" style={{ fontFamily: 'Syne, sans-serif' }}>
               {latest.sustainabilityScore}
-              <span className="text-xl" style={{ color: '#444' }}>/100</span>
+              <span className="text-xl" style={{ color: '#444' }}>
+                /100
+              </span>
             </p>
             <p className="text-xs mt-1.5" style={{ color: '#444' }}>
               {getScoreInfo(latest.sustainabilityScore).label}
@@ -96,15 +107,23 @@ export default function HistoryPage() {
           {assessments.length > 1 && (
             <div
               className="glass-card p-6 text-center"
-              style={{ borderColor: hasImproved ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.08)' }}
+              style={{
+                borderColor: hasImproved ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.08)',
+              }}
             >
-              <p className="text-xs font-mono uppercase tracking-widest mb-3" style={{ color: '#444' }}>
+              <p
+                className="text-xs font-mono uppercase tracking-widest mb-3"
+                style={{ color: '#444' }}
+              >
                 {hasImproved ? 'Total Reduction' : 'Change'}
               </p>
               <p className="text-4xl font-bold ticker" style={{ fontFamily: 'Syne, sans-serif' }}>
-                {hasImproved ? '−' : '+'}{formatNumber(Math.abs(totalReduction))}
+                {hasImproved ? '−' : '+'}
+                {formatNumber(Math.abs(totalReduction))}
               </p>
-              <p className="text-xs mt-1.5" style={{ color: '#444' }}>kg CO₂ since first assessment</p>
+              <p className="text-xs mt-1.5" style={{ color: '#444' }}>
+                kg CO₂ since first assessment
+              </p>
             </div>
           )}
         </div>
@@ -116,7 +135,6 @@ export default function HistoryPage() {
           </h2>
           <div className="space-y-3">
             {assessments.map((a, i) => {
-              const scoreInfo = getScoreInfo(a.sustainabilityScore);
               const isLatest = i === 0;
               return (
                 <article
@@ -141,7 +159,9 @@ export default function HistoryPage() {
                         >
                           {a.sustainabilityScore}
                         </span>
-                        <span className="text-[9px]" style={{ color: '#444' }}>/100</span>
+                        <span className="text-[9px]" style={{ color: '#444' }}>
+                          /100
+                        </span>
                       </div>
 
                       <div>
@@ -154,7 +174,8 @@ export default function HistoryPage() {
                           )}
                         </div>
                         <p className="text-sm" style={{ color: '#555' }}>
-                          {formatRelativeTime(a.createdAt)} · {(a.totalEmission / TONNES_DIVISOR).toFixed(2)} tonnes CO₂/year
+                          {formatRelativeTime(a.createdAt)} ·{' '}
+                          {(a.totalEmission / TONNES_DIVISOR).toFixed(2)} tonnes CO₂/year
                         </p>
                         {/* Category breakdown */}
                         <div className="flex items-center gap-4 mt-2">
@@ -178,7 +199,9 @@ export default function HistoryPage() {
                         to={`/simulator/${a.id}`}
                         aria-label={`Simulate changes for assessment from ${formatDate(a.createdAt)}, score ${a.sustainabilityScore}`}
                       >
-                        <Button variant="secondary" size="sm">Simulate</Button>
+                        <Button variant="secondary" size="sm">
+                          Simulate
+                        </Button>
                       </Link>
                       <Link
                         to={`/dashboard/${a.id}`}

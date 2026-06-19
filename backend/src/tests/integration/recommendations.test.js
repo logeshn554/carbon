@@ -12,20 +12,18 @@ beforeAll(async () => {
     .send({ name: 'Rec Test User', email: `rec-test-${Date.now()}@example.com` });
   testUserId = userRes.body.data.id;
 
-  const assessRes = await request(app)
-    .post('/api/assessments')
-    .send({
-      userId: testUserId,
-      dailyCarKm: 30,
-      carFuelType: 'petrol',
-      shortFlightsPerYear: 4,
-      longFlightsPerYear: 2,
-      monthlyElectricityKwh: 350,
-      renewablePercentage: 0,
-      dietType: 'heavy_meat',
-      clothingItemsPerYear: 25,
-      electronicsItemsPerYear: 3,
-    });
+  const assessRes = await request(app).post('/api/assessments').send({
+    userId: testUserId,
+    dailyCarKm: 30,
+    carFuelType: 'petrol',
+    shortFlightsPerYear: 4,
+    longFlightsPerYear: 2,
+    monthlyElectricityKwh: 350,
+    renewablePercentage: 0,
+    dietType: 'heavy_meat',
+    clothingItemsPerYear: 25,
+    electronicsItemsPerYear: 3,
+  });
   testAssessmentId = assessRes.body.data.id;
 });
 

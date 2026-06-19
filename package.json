@@ -6,7 +6,11 @@
   "scripts": {
     "postinstall": "prisma generate --schema=backend/prisma/schema.prisma",
     "build": "prisma generate --schema=backend/prisma/schema.prisma",
-    "start": "prisma migrate deploy --schema=backend/prisma/schema.prisma && node backend/src/index.js"
+    "start": "prisma migrate deploy --schema=backend/prisma/schema.prisma && node backend/src/index.js",
+    "lint": "npm run lint --prefix frontend && npm run lint --prefix backend",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "npm run test --prefix backend && npm run test --prefix frontend"
   },
   "dependencies": {
     "@prisma/client": "^5.9.1",
@@ -18,6 +22,10 @@
     "morgan": "^1.10.0",
     "zod": "^3.22.4",
     "prisma": "^5.9.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5"
   },
   "engines": {
     "node": ">=18.0.0"

@@ -5,7 +5,6 @@ import {
   calculateFoodEmission,
   calculateShoppingEmission,
   calculateAllEmissions,
-  EMISSION_FACTORS,
 } from '../../services/carbonCalculator.js';
 
 describe('Carbon Calculator Service', () => {
@@ -70,21 +69,36 @@ describe('Carbon Calculator Service', () => {
     });
 
     it('calculates grid electricity emission correctly', () => {
-      const result = calculateEnergyEmission({ monthlyElectricityKwh: 200, renewablePercentage: 0 });
+      const result = calculateEnergyEmission({
+        monthlyElectricityKwh: 200,
+        renewablePercentage: 0,
+      });
       // 200 * 12 * 0.233 = 559.2 kg
       expect(result).toBeCloseTo(559.2, 0);
     });
 
     it('reduces emission with renewable energy', () => {
-      const fullGrid = calculateEnergyEmission({ monthlyElectricityKwh: 200, renewablePercentage: 0 });
-      const halfRenewable = calculateEnergyEmission({ monthlyElectricityKwh: 200, renewablePercentage: 50 });
-      const fullRenewable = calculateEnergyEmission({ monthlyElectricityKwh: 200, renewablePercentage: 100 });
+      const fullGrid = calculateEnergyEmission({
+        monthlyElectricityKwh: 200,
+        renewablePercentage: 0,
+      });
+      const halfRenewable = calculateEnergyEmission({
+        monthlyElectricityKwh: 200,
+        renewablePercentage: 50,
+      });
+      const fullRenewable = calculateEnergyEmission({
+        monthlyElectricityKwh: 200,
+        renewablePercentage: 100,
+      });
       expect(halfRenewable).toBeCloseTo(fullGrid / 2, 0);
       expect(fullRenewable).toBe(0);
     });
 
     it('caps renewable percentage at 100', () => {
-      const result = calculateEnergyEmission({ monthlyElectricityKwh: 200, renewablePercentage: 150 });
+      const result = calculateEnergyEmission({
+        monthlyElectricityKwh: 200,
+        renewablePercentage: 150,
+      });
       expect(result).toBe(0);
     });
   });
@@ -126,7 +140,10 @@ describe('Carbon Calculator Service', () => {
     });
 
     it('sums clothing and electronics', () => {
-      const result = calculateShoppingEmission({ clothingItemsPerYear: 5, electronicsItemsPerYear: 1 });
+      const result = calculateShoppingEmission({
+        clothingItemsPerYear: 5,
+        electronicsItemsPerYear: 1,
+      });
       // 5 * 33 + 1 * 300 = 165 + 300 = 465
       expect(result).toBe(465);
     });
@@ -154,7 +171,11 @@ describe('Carbon Calculator Service', () => {
         electronicsItemsPerYear: 1,
       };
       const result = calculateAllEmissions(data);
-      const sum = result.transportEmission + result.energyEmission + result.foodEmission + result.shoppingEmission;
+      const sum =
+        result.transportEmission +
+        result.energyEmission +
+        result.foodEmission +
+        result.shoppingEmission;
       expect(result.totalEmission).toBe(Math.round(sum));
     });
 
@@ -166,7 +187,11 @@ describe('Carbon Calculator Service', () => {
         dietType: 'mixed',
         clothingItemsPerYear: 5,
       });
-      const sum = result.breakdown.transport + result.breakdown.energy + result.breakdown.food + result.breakdown.shopping;
+      const sum =
+        result.breakdown.transport +
+        result.breakdown.energy +
+        result.breakdown.food +
+        result.breakdown.shopping;
       expect(sum).toBeCloseTo(100, 0);
     });
 
@@ -182,12 +207,17 @@ describe('Carbon Calculator Service', () => {
   describe('Edge Cases', () => {
     it('zero inputs return zero for transport, energy, shopping', () => {
       const result = calculateAllEmissions({
-        dailyCarKm: 0, carFuelType: 'none',
-        publicTransportKmPerWeek: 0, cyclingKmPerWeek: 0,
-        shortFlightsPerYear: 0, longFlightsPerYear: 0,
-        monthlyElectricityKwh: 0, renewablePercentage: 0,
+        dailyCarKm: 0,
+        carFuelType: 'none',
+        publicTransportKmPerWeek: 0,
+        cyclingKmPerWeek: 0,
+        shortFlightsPerYear: 0,
+        longFlightsPerYear: 0,
+        monthlyElectricityKwh: 0,
+        renewablePercentage: 0,
         dietType: 'vegan',
-        clothingItemsPerYear: 0, electronicsItemsPerYear: 0,
+        clothingItemsPerYear: 0,
+        electronicsItemsPerYear: 0,
       });
       expect(result.transportEmission).toBe(0);
       expect(result.energyEmission).toBe(0);
@@ -215,7 +245,10 @@ describe('Carbon Calculator Service', () => {
     });
 
     it('renewablePercentage clamped to 100 eliminates energy emission', () => {
-      const result = calculateEnergyEmission({ monthlyElectricityKwh: 500, renewablePercentage: 999 });
+      const result = calculateEnergyEmission({
+        monthlyElectricityKwh: 500,
+        renewablePercentage: 999,
+      });
       expect(result).toBe(0);
     });
 

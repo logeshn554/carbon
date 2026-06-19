@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master, development]
+  pull_request:
+    branches: [main, master, development]
+
+jobs:
+  test:
+    name: Lint, Format, and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: |
+          npm install
+          npm install --prefix backend
+          npm install --prefix frontend
+
+      - name: Generate Prisma Client
+        run: npm run build
+
+      - name: Prettier Format Check
+        run: npm run format:check
+
+      - name: Run Monorepo Lint Checks
+        run: npm run lint
+
+      - name: Run Monorepo Test Suites
+        run: npm run test

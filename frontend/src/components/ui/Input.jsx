@@ -22,7 +22,11 @@ const Input = forwardRef(function Input(
       {label && (
         <label htmlFor={id} className="form-label">
           {label}
-          {required && <span className="text-rose-400 ml-1" aria-hidden="true">*</span>}
+          {required && (
+            <span className="text-rose-400 ml-1" aria-hidden="true">
+              *
+            </span>
+          )}
         </label>
       )}
       <input

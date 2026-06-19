@@ -9,7 +9,6 @@ import { PageLoader } from '../components/ui/LoadingSpinner';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
-import { formatEmissionTonnes } from '../utils/formatters';
 import Icon from '../components/ui/Icons';
 
 /** @constant {number} TONNES_DIVISOR - Converts kg to tonnes */
@@ -43,18 +42,25 @@ export default function SimulatorPage() {
     }
   }, [selectedScenario, assessmentId, runSimulation]);
 
-  const categoryRows = useMemo(() => [
-    { key: 'transport', label: 'Transport', icon: 'transport' },
-    { key: 'energy', label: 'Energy', icon: 'energy' },
-    { key: 'food', label: 'Food', icon: 'food' },
-    { key: 'shopping', label: 'Shopping', icon: 'shopping' },
-  ], []);
+  const categoryRows = useMemo(
+    () => [
+      { key: 'transport', label: 'Transport', icon: 'transport' },
+      { key: 'energy', label: 'Energy', icon: 'energy' },
+      { key: 'food', label: 'Food', icon: 'food' },
+      { key: 'shopping', label: 'Shopping', icon: 'shopping' },
+    ],
+    []
+  );
 
   if (loading) return <PageLoader />;
 
   if (!assessment) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4" role="status" aria-label="Loading simulation data">
+      <div
+        className="min-h-[60vh] flex flex-col items-center justify-center gap-4"
+        role="status"
+        aria-label="Loading simulation data"
+      >
         <LoadingSpinner size="xl" label="Loading simulation data..." />
         <p className="text-slate-400 animate-pulse">Loading simulation data...</p>
       </div>
@@ -64,7 +70,6 @@ export default function SimulatorPage() {
   return (
     <div className="min-h-screen py-10 px-4">
       <div className="max-w-6xl mx-auto">
-
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
@@ -96,16 +101,28 @@ export default function SimulatorPage() {
           style={{ borderColor: 'rgba(255,255,255,0.08)' }}
         >
           <div>
-            <p className="text-xs uppercase tracking-widest mb-1.5" style={{ color: 'var(--color-text-faint)' }}>
+            <p
+              className="text-xs uppercase tracking-widest mb-1.5"
+              style={{ color: 'var(--color-text-faint)' }}
+            >
               Your Current Footprint
             </p>
-            <p className="text-2xl font-bold gradient-text" style={{ fontFamily: 'Syne, sans-serif' }}>
+            <p
+              className="text-2xl font-bold gradient-text"
+              style={{ fontFamily: 'Syne, sans-serif' }}
+            >
               {(assessment.totalEmission / TONNES_DIVISOR).toFixed(2)} tonnes CO₂/year
             </p>
           </div>
-          <div className="h-8 w-px hidden sm:block" style={{ background: 'rgba(255,255,255,0.08)' }} aria-hidden="true" />
+          <div
+            className="h-8 w-px hidden sm:block"
+            style={{ background: 'rgba(255,255,255,0.08)' }}
+            aria-hidden="true"
+          />
           <div>
-            <p className="text-xs mb-1.5" style={{ color: 'var(--color-text-faint)' }}>Sustainability Score</p>
+            <p className="text-xs mb-1.5" style={{ color: 'var(--color-text-faint)' }}>
+              Sustainability Score
+            </p>
             <p className="text-xl font-bold" style={{ color: 'var(--color-text)' }}>
               {assessment.sustainabilityScore}/100
             </p>
@@ -129,7 +146,9 @@ export default function SimulatorPage() {
               loading={simLoading}
             />
             {simError && (
-              <p className="mt-4 text-sm" style={{ color: '#fb7185' }} role="alert">{simError}</p>
+              <p className="mt-4 text-sm" style={{ color: '#fb7185' }} role="alert">
+                {simError}
+              </p>
             )}
           </Card>
 
@@ -139,10 +158,7 @@ export default function SimulatorPage() {
               <>
                 <ImpactDisplay simulation={simulation} />
                 <Card>
-                  <h3
-                    className="font-semibold mb-4"
-                    style={{ color: 'var(--color-text)' }}
-                  >
+                  <h3 className="font-semibold mb-4" style={{ color: 'var(--color-text)' }}>
                     Detailed Comparison
                   </h3>
                   <ComparisonBar
@@ -175,23 +191,19 @@ export default function SimulatorPage() {
                 </Card>
               </>
             ) : (
-              <div
-                className="glass-card p-12 text-center flex flex-col items-center justify-center min-h-[300px]"
-              >
+              <div className="glass-card p-12 text-center flex flex-col items-center justify-center min-h-[300px]">
                 <div
                   className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5"
                   style={{ background: 'rgba(79,142,247,0.1)', color: '#4F8EF7' }}
                 >
                   <Icon name="flask" size={28} />
                 </div>
-                <h3
-                  className="font-semibold mb-2"
-                  style={{ color: 'var(--color-text)' }}
-                >
+                <h3 className="font-semibold mb-2" style={{ color: 'var(--color-text)' }}>
                   Choose a Scenario to Simulate
                 </h3>
                 <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                  Select a lifestyle change from the left panel and click Run Simulation to see projected impact.
+                  Select a lifestyle change from the left panel and click Run Simulation to see
+                  projected impact.
                 </p>
               </div>
             )}
@@ -207,16 +219,23 @@ export default function SimulatorPage() {
                     <div
                       key={i}
                       className="flex items-center justify-between p-3 rounded-xl"
-                      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}
+                      style={{
+                        background: 'rgba(255,255,255,0.03)',
+                        border: '1px solid rgba(255,255,255,0.05)',
+                      }}
                     >
-                      <span className="text-sm truncate" style={{ color: 'var(--color-text-muted)' }}>
+                      <span
+                        className="text-sm truncate"
+                        style={{ color: 'var(--color-text-muted)' }}
+                      >
                         {sim.scenarioName}
                       </span>
                       <span
                         className="text-sm font-mono font-semibold flex-shrink-0 ml-3"
                         style={{ color: sim.annualSavingsKg > 0 ? '#00C27B' : '#f43f5e' }}
                       >
-                        {sim.annualSavingsKg > 0 ? '−' : '+'}{Math.abs(sim.annualSavingsKg).toLocaleString()} kg
+                        {sim.annualSavingsKg > 0 ? '−' : '+'}
+                        {Math.abs(sim.annualSavingsKg).toLocaleString()} kg
                       </span>
                     </div>
                   ))}

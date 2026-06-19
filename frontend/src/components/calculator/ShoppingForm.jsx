@@ -7,7 +7,11 @@ import { CLOTHING_FACTOR, ELECTRONICS_FACTOR, INPUT_LIMITS } from '../../utils/c
 
 const tips = [
   { icon: 'recycle', title: 'Second-Hand', desc: 'Buying second-hand reduces emissions by 60–80%' },
-  { icon: 'wrench', title: 'Repair First', desc: 'Extending device life by 1 year saves ~150 kg CO₂' },
+  {
+    icon: 'wrench',
+    title: 'Repair First',
+    desc: 'Extending device life by 1 year saves ~150 kg CO₂',
+  },
   { icon: 'minus_circle', title: 'Buy Less', desc: 'The most sustainable product is one not made' },
 ];
 
@@ -41,8 +45,8 @@ function ShoppingForm({ data, onChange }) {
       <legend className="sr-only">Shopping and Consumer Goods Information</legend>
       <div className="space-y-6">
         <p className="text-sm leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
-          Manufacturing and shipping consumer goods accounts for a significant portion of personal carbon footprints.
-          This includes production emissions, not just delivery.
+          Manufacturing and shipping consumer goods accounts for a significant portion of personal
+          carbon footprints. This includes production emissions, not just delivery.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -55,8 +59,16 @@ function ShoppingForm({ data, onChange }) {
               max={INPUT_LIMITS.clothingItemsPerYear.max}
               placeholder="0"
               value={data.clothingItemsPerYear || ''}
-              onChange={(e) => handleChange('clothingItemsPerYear',
-                sanitizeInteger(e.target.value, INPUT_LIMITS.clothingItemsPerYear.min, INPUT_LIMITS.clothingItemsPerYear.max))}
+              onChange={(e) =>
+                handleChange(
+                  'clothingItemsPerYear',
+                  sanitizeInteger(
+                    e.target.value,
+                    INPUT_LIMITS.clothingItemsPerYear.min,
+                    INPUT_LIMITS.clothingItemsPerYear.max
+                  )
+                )
+              }
               hint={`Include shoes, accessories, etc. ~${CLOTHING_FACTOR} kg CO₂ per item`}
             />
             {data.clothingItemsPerYear > 0 && (
@@ -75,8 +87,16 @@ function ShoppingForm({ data, onChange }) {
               max={INPUT_LIMITS.electronicsItemsPerYear.max}
               placeholder="0"
               value={data.electronicsItemsPerYear || ''}
-              onChange={(e) => handleChange('electronicsItemsPerYear',
-                sanitizeInteger(e.target.value, INPUT_LIMITS.electronicsItemsPerYear.min, INPUT_LIMITS.electronicsItemsPerYear.max))}
+              onChange={(e) =>
+                handleChange(
+                  'electronicsItemsPerYear',
+                  sanitizeInteger(
+                    e.target.value,
+                    INPUT_LIMITS.electronicsItemsPerYear.min,
+                    INPUT_LIMITS.electronicsItemsPerYear.max
+                  )
+                )
+              }
               hint={`Smartphones, laptops, tablets, etc. ~${ELECTRONICS_FACTOR} kg CO₂ per device`}
             />
             {data.electronicsItemsPerYear > 0 && (
@@ -117,11 +137,19 @@ function ShoppingForm({ data, onChange }) {
         {totalShoppingEmission > 0 && (
           <div
             className="rounded-xl p-4 flex items-start gap-3 animate-fade-in"
-            style={{ border: '1px solid rgba(245,158,11,0.18)', background: 'rgba(245,158,11,0.05)' }}
+            style={{
+              border: '1px solid rgba(245,158,11,0.18)',
+              background: 'rgba(245,158,11,0.05)',
+            }}
             aria-live="polite"
             aria-atomic="true"
           >
-            <Icon name="shopping" size={15} style={{ color: '#fbbf24' }} className="flex-shrink-0 mt-0.5 text-current" />
+            <Icon
+              name="shopping"
+              size={15}
+              style={{ color: '#fbbf24' }}
+              className="flex-shrink-0 mt-0.5 text-current"
+            />
             <p className="text-sm font-medium" style={{ color: '#fbbf24' }}>
               Total shopping emissions: ~{totalShoppingEmission.toLocaleString()} kg CO₂/year
             </p>

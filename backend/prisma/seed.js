@@ -101,11 +101,14 @@ async function seed() {
     for (let j = 0; j < 2; j++) {
       const template = assessmentTemplates[i];
       // Slightly vary the second assessment to simulate improvement
-      const assessData = j === 0 ? template : {
-        ...template,
-        dailyCarKm: Math.max(0, template.dailyCarKm - 5),
-        monthlyElectricityKwh: Math.max(0, template.monthlyElectricityKwh - 20),
-      };
+      const assessData =
+        j === 0
+          ? template
+          : {
+              ...template,
+              dailyCarKm: Math.max(0, template.dailyCarKm - 5),
+              monthlyElectricityKwh: Math.max(0, template.monthlyElectricityKwh - 20),
+            };
 
       const transport = calcTransport(assessData);
       const energy = calcEnergy(assessData);
@@ -129,7 +132,8 @@ async function seed() {
             create: [
               {
                 title: 'Example: Switch to Renewable Energy',
-                description: 'Sign up for a green energy tariff to reduce electricity emissions significantly.',
+                description:
+                  'Sign up for a green energy tariff to reduce electricity emissions significantly.',
                 estimatedSavings: Math.round(energy * 0.7),
                 priority: 'HIGH',
                 category: 'energy',

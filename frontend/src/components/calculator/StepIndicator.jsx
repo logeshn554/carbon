@@ -22,30 +22,24 @@ function StepIndicator({ steps, currentStep }) {
               {/* Step circle */}
               <div className="flex flex-col items-center">
                 <div
-                  className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300"
-                  style={{
-                    background: isComplete
-                      ? 'rgba(16, 185, 129, 0.15)'
+                  className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 ${
+                    isComplete
+                      ? 'bg-emerald-500/15 border border-emerald-500/40 text-emerald-400'
                       : isActive
-                      ? '#10B981'
-                      : 'transparent',
-                    border: isComplete
-                      ? '1px solid rgba(16, 185, 129, 0.4)'
-                      : isActive
-                      ? 'none'
-                      : '1px solid rgba(255,255,255,0.08)',
-                    boxShadow: isActive ? '0 0 20px rgba(16, 185, 129, 0.35)' : 'none',
-                  }}
+                        ? 'bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.35)] text-black'
+                        : 'bg-transparent border border-white/10 text-slate-400'
+                  }`}
                   aria-current={isActive ? 'step' : undefined}
                 >
                   {isComplete ? (
-                    <span className="text-xs font-bold text-[#10B981]" aria-label="Completed">
+                    <span className="text-xs font-bold text-emerald-400" aria-label="Completed">
                       ✓
                     </span>
                   ) : (
                     <span
-                      className="text-xs font-bold font-mono"
-                      style={{ color: isActive ? '#000' : 'rgba(255,255,255,0.2)' }}
+                      className={`text-xs font-bold font-mono ${
+                        isActive ? 'text-black' : 'text-slate-400'
+                      }`}
                     >
                       {String(index + 1).padStart(2, '0')}
                     </span>
@@ -53,14 +47,17 @@ function StepIndicator({ steps, currentStep }) {
                 </div>
                 <div className="mt-2 text-center hidden sm:block">
                   <p
-                    className="text-xs font-semibold transition-colors"
-                    style={{
-                      color: isActive ? '#10B981' : isComplete ? '#059669' : '#475569',
-                    }}
+                    className={`text-xs font-semibold transition-colors ${
+                      isActive
+                        ? 'text-emerald-400'
+                        : isComplete
+                          ? 'text-emerald-500'
+                          : 'text-slate-400'
+                    }`}
                   >
                     {step.label}
                   </p>
-                  <p className="text-[10px] hidden md:block mt-0.5" style={{ color: '#475569' }}>
+                  <p className="text-[10px] hidden md:block mt-0.5 text-slate-400">
                     {step.sublabel}
                   </p>
                 </div>

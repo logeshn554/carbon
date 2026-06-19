@@ -10,7 +10,6 @@ export default function Footer() {
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-14">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
-
           {/* Brand */}
           <div>
             <div className="mb-4">
@@ -22,14 +21,17 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-sm leading-relaxed" style={{ color: '#444' }}>
-              Helping individuals understand and reduce their carbon footprint through
-              intelligent analysis and personalized recommendations.
+              Helping individuals understand and reduce their carbon footprint through intelligent
+              analysis and personalized recommendations.
             </p>
           </div>
 
           {/* Features */}
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-widest mb-5" style={{ color: '#444' }}>
+            <h3
+              className="text-xs font-semibold uppercase tracking-widest mb-5"
+              style={{ color: '#444' }}
+            >
               Features
             </h3>
             <ul className="space-y-3" role="list">
@@ -42,8 +44,8 @@ export default function Footer() {
                     to={link.to}
                     className="text-sm animated-underline transition-colors duration-200"
                     style={{ color: '#444' }}
-                    onMouseEnter={(e) => e.currentTarget.style.color = '#fff'}
-                    onMouseLeave={(e) => e.currentTarget.style.color = '#444'}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = '#fff')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = '#444')}
                   >
                     {link.label}
                   </Link>
@@ -54,7 +56,10 @@ export default function Footer() {
 
           {/* Data Sources */}
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-widest mb-5" style={{ color: '#444' }}>
+            <h3
+              className="text-xs font-semibold uppercase tracking-widest mb-5"
+              style={{ color: '#444' }}
+            >
               Data Sources
             </h3>
             <ul className="space-y-2 text-sm" style={{ color: '#444' }} role="list">
@@ -86,8 +91,14 @@ export default function Footer() {
           <p className="text-sm" style={{ color: '#333' }}>
             &copy; {new Date().getFullYear()} EcoGuide AI. Built for a sustainable future.
           </p>
-          <div className="flex items-center gap-2 text-sm font-mono" style={{ color: '#333', letterSpacing: '0.05em' }}>
-            <span className="inline-block w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#fff' }} />
+          <div
+            className="flex items-center gap-2 text-sm font-mono"
+            style={{ color: '#333', letterSpacing: '0.05em' }}
+          >
+            <span
+              className="inline-block w-1.5 h-1.5 rounded-full animate-pulse"
+              style={{ background: '#fff' }}
+            />
             CARBON NEUTRAL BY 2050
           </div>
         </div>

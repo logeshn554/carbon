@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { calculateScore, getScoreLabel, compareToAverages, BENCHMARKS } from '../../services/scoringService.js';
+import {
+  calculateScore,
+  getScoreLabel,
+  compareToAverages,
+} from '../../services/scoringService.js';
 
 describe('Scoring Service', () => {
   describe('calculateScore', () => {

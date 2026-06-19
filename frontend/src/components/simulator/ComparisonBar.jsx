@@ -19,7 +19,11 @@ export default function ComparisonBar({ original, projected, label = '' }) {
   const isReduction = projected < original;
 
   return (
-    <div className="space-y-3" role="img" aria-label={`${label}: Current ${formatNumber(original)}kg vs Projected ${formatNumber(projected)}kg`}>
+    <div
+      className="space-y-3"
+      role="img"
+      aria-label={`${label}: Current ${formatNumber(original)}kg vs Projected ${formatNumber(projected)}kg`}
+    >
       {label && <p className="text-sm text-slate-400 font-medium">{label}</p>}
 
       <div className="space-y-2">
@@ -54,7 +58,9 @@ export default function ComparisonBar({ original, projected, label = '' }) {
               aria-hidden="true"
             />
           </div>
-          <span className={`text-xs w-20 flex-shrink-0 font-mono font-semibold ${isReduction ? 'text-emerald-400' : 'text-rose-400'}`}>
+          <span
+            className={`text-xs w-20 flex-shrink-0 font-mono font-semibold ${isReduction ? 'text-emerald-400' : 'text-rose-400'}`}
+          >
             {formatNumber(projected)} kg
           </span>
         </div>
@@ -62,10 +68,13 @@ export default function ComparisonBar({ original, projected, label = '' }) {
 
       {/* Savings badge */}
       <div className="flex justify-end">
-        <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${
-          isReduction ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'
-        }`}>
-          {isReduction ? '−' : '+'}{formatNumber(Math.abs(original - projected))} kg
+        <span
+          className={`text-xs px-2 py-0.5 rounded-full font-semibold ${
+            isReduction ? 'bg-emerald-500/15 text-emerald-400' : 'bg-rose-500/15 text-rose-400'
+          }`}
+        >
+          {isReduction ? '−' : '+'}
+          {formatNumber(Math.abs(original - projected))} kg
         </span>
       </div>
     </div>

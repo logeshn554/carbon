@@ -16,10 +16,12 @@ const MAX_CACHE_SIZE = 50;
  */
 export function getCacheKey(data) {
   // Sort keys for stable serialization regardless of insertion order
-  const sorted = Object.keys(data).sort().reduce((acc, k) => {
-    acc[k] = data[k];
-    return acc;
-  }, {});
+  const sorted = Object.keys(data)
+    .sort()
+    .reduce((acc, k) => {
+      acc[k] = data[k];
+      return acc;
+    }, {});
   return JSON.stringify(sorted);
 }
 

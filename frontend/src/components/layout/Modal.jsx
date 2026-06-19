@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import Icon from '../ui/Icons';
 
 /** @constant {string} FOCUSABLE_SELECTOR - CSS selector for focusable elements */
-const FOCUSABLE_SELECTOR = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+const FOCUSABLE_SELECTOR =
+  'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
 /**
  * Modal — accessible dialog component with focus trapping, Escape key,
@@ -30,19 +31,28 @@ export default function Modal({ children, onClose, title }) {
   }, []);
 
   // Handle Escape key and Tab-based focus trapping
-  const handleKeyDown = useCallback((e) => {
-    if (e.key === 'Escape') onClose();
-    if (e.key === 'Tab') {
-      const focusable = modalRef.current?.querySelectorAll(FOCUSABLE_SELECTOR);
-      const first = focusable?.[0];
-      const last = focusable?.[focusable.length - 1];
-      if (e.shiftKey) {
-        if (document.activeElement === first) { e.preventDefault(); last?.focus(); }
-      } else {
-        if (document.activeElement === last) { e.preventDefault(); first?.focus(); }
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'Tab') {
+        const focusable = modalRef.current?.querySelectorAll(FOCUSABLE_SELECTOR);
+        const first = focusable?.[0];
+        const last = focusable?.[focusable.length - 1];
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last?.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first?.focus();
+          }
+        }
       }
-    }
-  }, [onClose]);
+    },
+    [onClose]
+  );
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
@@ -57,9 +67,12 @@ export default function Modal({ children, onClose, title }) {
    * Close modal on backdrop click (only if the click target is the overlay itself).
    * @param {React.MouseEvent} e - The click event
    */
-  const handleOverlayClick = useCallback((e) => {
-    if (e.target === overlayRef.current) onClose();
-  }, [onClose]);
+  const handleOverlayClick = useCallback(
+    (e) => {
+      if (e.target === overlayRef.current) onClose();
+    },
+    [onClose]
+  );
 
   return (
     <div

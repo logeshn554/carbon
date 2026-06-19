@@ -13,7 +13,7 @@ export const apiLimiter = rateLimit({
     error: 'Too many requests from this IP, please try again later.',
     retryAfter: Math.ceil(windowMs / 1000 / 60),
   },
-  skip: (req) => process.env.NODE_ENV === 'test',
+  skip: (_req) => process.env.NODE_ENV === 'test',
 });
 
 // Stricter limiter for user creation
@@ -26,5 +26,5 @@ export const createLimiter = rateLimit({
     success: false,
     error: 'Too many accounts created. Please try again in an hour.',
   },
-  skip: (req) => process.env.NODE_ENV === 'test',
+  skip: (_req) => process.env.NODE_ENV === 'test',
 });

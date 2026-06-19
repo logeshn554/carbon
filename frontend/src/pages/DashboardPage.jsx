@@ -1,17 +1,19 @@
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useEffect, useMemo, useCallback, lazy, Suspense } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useAssessment, useUserAssessments } from '../hooks/useAssessment';
 import { useUser } from '../hooks/useUser';
 import FootprintCard from '../components/dashboard/FootprintCard';
 import ScoreGauge from '../components/dashboard/ScoreGauge';
-import EmissionPieChart from '../components/dashboard/EmissionPieChart';
-import TrendChart from '../components/dashboard/TrendChart';
 import RecommendationCard from '../components/dashboard/RecommendationCard';
 import LoadingSpinner, { PageLoader } from '../components/ui/LoadingSpinner';
 import Button from '../components/ui/Button';
 import { formatDate, getScoreInfo } from '../utils/formatters';
 import { GLOBAL_AVERAGE_EMISSION, UK_AVERAGE_EMISSION, TARGET_EMISSION } from '../utils/constants';
+
+// Lazy-load heavy Recharts-dependent visualization components to minimize initial bundle size
+const EmissionPieChart = lazy(() => import('../components/dashboard/EmissionPieChart'));
+const TrendChart = lazy(() => import('../components/dashboard/TrendChart'));
 
 /** @constant {number} TONNES_DIVISOR - Divisor to convert kg to tonnes */
 const TONNES_DIVISOR = 1000;
@@ -41,21 +43,23 @@ function BenchmarkBar({ label, benchmarkKg, userKg, color }) {
   const maxVal = Math.max(benchmarkKg, userKg) * 1.15;
   const benchPct = (benchmarkKg / maxVal) * 100;
   const userPct = (userKg / maxVal) * 100;
-  const diff = ((userKg - benchmarkKg) / benchmarkKg * 100).toFixed(0);
+  const diff = (((userKg - benchmarkKg) / benchmarkKg) * 100).toFixed(0);
   const isBelow = userKg < benchmarkKg;
 
   return (
     <div className="mb-4">
       <div className="flex items-center justify-between mb-1.5">
-        <span className="text-xs font-medium" style={{ color: '#aaa' }}>{label}</span>
-        <span
-          className="text-xs font-semibold"
-          style={{ color: isBelow ? '#10b981' : '#f59e0b' }}
-        >
+        <span className="text-xs font-medium" style={{ color: '#aaa' }}>
+          {label}
+        </span>
+        <span className="text-xs font-semibold" style={{ color: isBelow ? '#10b981' : '#f59e0b' }}>
           {isBelow ? '↓' : '↑'} {Math.abs(diff)}% {isBelow ? 'below' : 'above'}
         </span>
       </div>
-      <div className="relative h-3 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+      <div
+        className="relative h-3 rounded-full overflow-hidden"
+        style={{ background: 'rgba(255,255,255,0.06)' }}
+      >
         {/* Benchmark marker */}
         <div
           className="absolute top-0 bottom-0 w-0.5 z-10"
@@ -136,12 +140,18 @@ export default function DashboardPage() {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-4">
         <div className="text-center">
-          <p className="text-xs font-mono mb-4" style={{ color: '#444', letterSpacing: '0.1em' }}>ERROR</p>
+          <p className="text-xs font-mono mb-4" style={{ color: '#444', letterSpacing: '0.1em' }}>
+            ERROR
+          </p>
           <h2 className="text-2xl font-bold mb-2" style={{ fontFamily: 'Syne, sans-serif' }}>
             Assessment Not Found
           </h2>
-          <p className="mb-6" style={{ color: '#555' }}>{error}</p>
-          <Link to="/calculator"><Button>New Assessment</Button></Link>
+          <p className="mb-6" style={{ color: '#555' }}>
+            {error}
+          </p>
+          <Link to="/calculator">
+            <Button>New Assessment</Button>
+          </Link>
         </div>
       </div>
     );
@@ -149,7 +159,11 @@ export default function DashboardPage() {
 
   if (!assessment) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4" role="status" aria-label="Loading assessment">
+      <div
+        className="min-h-[60vh] flex flex-col items-center justify-center gap-4"
+        role="status"
+        aria-label="Loading assessment"
+      >
         <LoadingSpinner size="xl" label="Loading assessment data..." />
         <p className="text-slate-400 animate-pulse">Loading assessment data...</p>
       </div>
@@ -159,7 +173,6 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen py-10 px-4">
       <div className="max-w-6xl mx-auto">
-
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
@@ -173,7 +186,9 @@ export default function DashboardPage() {
           </div>
           <div className="flex gap-3 flex-wrap">
             <Link to={`/simulator/${assessmentId}`}>
-              <Button variant="secondary" id="btn-simulate">Simulate Changes</Button>
+              <Button variant="secondary" id="btn-simulate">
+                Simulate Changes
+              </Button>
             </Link>
             <Link to="/calculator">
               <Button id="btn-new-assessment">New Assessment</Button>
@@ -190,7 +205,10 @@ export default function DashboardPage() {
         >
           <div
             className="w-12 h-12 rounded-xl flex flex-col items-center justify-center flex-shrink-0"
-            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
+            style={{
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.1)',
+            }}
           >
             <span
               className="text-sm font-bold ticker"
@@ -198,7 +216,9 @@ export default function DashboardPage() {
             >
               {assessment.sustainabilityScore}
             </span>
-            <span className="text-[9px]" style={{ color: '#444' }}>/100</span>
+            <span className="text-[9px]" style={{ color: '#444' }}>
+              /100
+            </span>
           </div>
           <div>
             <p className="font-semibold" style={{ color: '#fff' }}>
@@ -212,8 +232,12 @@ export default function DashboardPage() {
 
         {/* Main grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
-          <div className="lg:col-span-2"><FootprintCard assessment={assessment} /></div>
-          <div><ScoreGauge score={assessment.sustainabilityScore} /></div>
+          <div className="lg:col-span-2">
+            <FootprintCard assessment={assessment} />
+          </div>
+          <div>
+            <ScoreGauge score={assessment.sustainabilityScore} />
+          </div>
         </div>
 
         {/* How You Compare section */}
@@ -247,8 +271,39 @@ export default function DashboardPage() {
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
-          <EmissionPieChart assessment={assessment} />
-          <TrendChart assessments={assessments} />
+          <Suspense
+            fallback={
+              <div
+                className="glass-card p-6 h-80 flex flex-col items-center justify-center gap-4 animate-pulse"
+                style={{
+                  borderColor: 'rgba(255,255,255,0.06)',
+                  background: 'rgba(255,255,255,0.02)',
+                }}
+              >
+                <LoadingSpinner size="lg" label="Loading breakdown chart..." />
+                <p className="text-xs text-slate-400">Loading breakdown chart...</p>
+              </div>
+            }
+          >
+            <EmissionPieChart assessment={assessment} />
+          </Suspense>
+
+          <Suspense
+            fallback={
+              <div
+                className="glass-card p-6 h-80 flex flex-col items-center justify-center gap-4 animate-pulse"
+                style={{
+                  borderColor: 'rgba(255,255,255,0.06)',
+                  background: 'rgba(255,255,255,0.02)',
+                }}
+              >
+                <LoadingSpinner size="lg" label="Loading trend chart..." />
+                <p className="text-xs text-slate-400">Loading history trends...</p>
+              </div>
+            }
+          >
+            <TrendChart assessments={assessments} />
+          </Suspense>
         </div>
 
         {/* Recommendations */}
@@ -276,7 +331,11 @@ export default function DashboardPage() {
         {assessments.length > 1 && (
           <section className="mt-10" aria-labelledby="history-heading">
             <div className="flex items-center justify-between mb-5">
-              <h2 id="history-heading" className="text-xl font-bold" style={{ fontFamily: 'Syne, sans-serif' }}>
+              <h2
+                id="history-heading"
+                className="text-xl font-bold"
+                style={{ fontFamily: 'Syne, sans-serif' }}
+              >
                 Recent Assessments
               </h2>
               <Link to="/history" className="text-sm animated-underline" style={{ color: '#555' }}>
@@ -294,7 +353,10 @@ export default function DashboardPage() {
                     <p className="text-xs mb-2 font-mono" style={{ color: '#444' }}>
                       {formatDate(a.createdAt)}
                     </p>
-                    <p className="text-2xl font-bold ticker" style={{ fontFamily: 'Syne, sans-serif' }}>
+                    <p
+                      className="text-2xl font-bold ticker"
+                      style={{ fontFamily: 'Syne, sans-serif' }}
+                    >
                       {(a.totalEmission / TONNES_DIVISOR).toFixed(2)}t
                     </p>
                     <p className="text-xs mt-1" style={{ color: '#444' }}>

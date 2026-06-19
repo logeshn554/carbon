@@ -12,49 +12,52 @@ const features = [
   {
     tag: '01',
     title: 'Carbon Calculator',
-    description: 'Measure your annual CO₂ footprint across transport, energy, food, and shopping with real IPCC emission factors.',
+    description:
+      'Measure your annual CO₂ footprint across transport, energy, food, and shopping with real IPCC emission factors.',
   },
   {
     tag: '02',
     title: 'AI Recommendations',
-    description: 'Get personalized, prioritized recommendations based on your largest emission sources — not generic advice.',
+    description:
+      'Get personalized, prioritized recommendations based on your largest emission sources — not generic advice.',
   },
   {
     tag: '03',
     title: 'Impact Simulator',
-    description: 'Simulate future scenarios — switch to an EV, install solar panels, go vegetarian — and see real projected savings.',
+    description:
+      'Simulate future scenarios — switch to an EV, install solar panels, go vegetarian — and see real projected savings.',
   },
   {
     tag: '04',
     title: 'Progress Tracking',
-    description: 'Track your footprint over time, compare assessments, and celebrate your reductions with visual trends.',
+    description:
+      'Track your footprint over time, compare assessments, and celebrate your reductions with visual trends.',
   },
 ];
 
 const steps = [
-  { num: '01', title: 'Answer 4 sections', desc: 'Transport, energy, food, and shopping — takes less than 5 minutes.' },
-  { num: '02', title: 'See your footprint', desc: 'Detailed CO₂ breakdown with a sustainability score out of 100.' },
-  { num: '03', title: 'Get AI recommendations', desc: 'Personalized actions ranked by impact, tailored to your lifestyle.' },
-  { num: '04', title: 'Simulate and track', desc: 'Model changes, retake the assessment, watch your footprint shrink.' },
+  {
+    num: '01',
+    title: 'Answer 4 sections',
+    desc: 'Transport, energy, food, and shopping — takes less than 5 minutes.',
+  },
+  {
+    num: '02',
+    title: 'See your footprint',
+    desc: 'Detailed CO₂ breakdown with a sustainability score out of 100.',
+  },
+  {
+    num: '03',
+    title: 'Get AI recommendations',
+    desc: 'Personalized actions ranked by impact, tailored to your lifestyle.',
+  },
+  {
+    num: '04',
+    title: 'Simulate and track',
+    desc: 'Model changes, retake the assessment, watch your footprint shrink.',
+  },
 ];
 
-// Animated counter hook
-function useCountUp(target, duration = 1200) {
-  const [current, setCurrent] = useState(0);
-  useEffect(() => {
-    let start = 0;
-    const end = parseFloat(target);
-    if (isNaN(end)) { setCurrent(target); return; }
-    const step = end / (duration / 16);
-    const timer = setInterval(() => {
-      start += step;
-      if (start >= end) { setCurrent(end); clearInterval(timer); }
-      else { setCurrent(Math.floor(start * 10) / 10); }
-    }, 16);
-    return () => clearInterval(timer);
-  }, [target, duration]);
-  return current;
-}
 
 function AnimatedStat({ value, label, delay = 0 }) {
   const [visible, setVisible] = useState(false);
@@ -66,7 +69,11 @@ function AnimatedStat({ value, label, delay = 0 }) {
   return (
     <div
       className="glass-card p-5 text-center animated-border"
-      style={{ opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(12px)', transition: 'all 0.5s ease' }}
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'none' : 'translateY(12px)',
+        transition: 'all 0.5s ease',
+      }}
     >
       <p
         className="text-2xl font-bold mb-1 ticker"
@@ -74,7 +81,9 @@ function AnimatedStat({ value, label, delay = 0 }) {
       >
         {value}
       </p>
-      <p className="text-xs" style={{ color: '#555' }}>{label}</p>
+      <p className="text-xs" style={{ color: '#555' }}>
+        {label}
+      </p>
     </div>
   );
 }
@@ -89,14 +98,18 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen">
-
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden py-32 px-4 grid-bg" aria-labelledby="hero-heading">
+      <section
+        className="relative overflow-hidden py-32 px-4 grid-bg"
+        aria-labelledby="hero-heading"
+      >
         {/* Ambient glow */}
         <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
           <div
             className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full blur-3xl"
-            style={{ background: 'radial-gradient(ellipse, rgba(255,255,255,0.04) 0%, transparent 70%)' }}
+            style={{
+              background: 'radial-gradient(ellipse, rgba(255,255,255,0.04) 0%, transparent 70%)',
+            }}
           />
         </div>
 
@@ -131,8 +144,8 @@ export default function HomePage() {
               transition: 'all 0.7s ease 0.15s',
             }}
           >
-            Measure your annual CO₂ footprint, receive personalized AI recommendations,
-            and simulate the impact of lifestyle changes — all backed by real emission science.
+            Measure your annual CO₂ footprint, receive personalized AI recommendations, and simulate
+            the impact of lifestyle changes — all backed by real emission science.
           </p>
 
           <div
@@ -149,16 +162,19 @@ export default function HomePage() {
               </button>
             </Link>
             <Link to="/history">
-              <button className="btn-secondary !px-10 !py-4 !text-base">
-                View History
-              </button>
+              <button className="btn-secondary !px-10 !py-4 !text-base">View History</button>
             </Link>
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-20">
             {stats.map((stat, i) => (
-              <AnimatedStat key={stat.label} value={stat.value} label={stat.label} delay={400 + i * 100} />
+              <AnimatedStat
+                key={stat.label}
+                value={stat.value}
+                label={stat.label}
+                delay={400 + i * 100}
+              />
             ))}
           </div>
         </div>
@@ -173,14 +189,23 @@ export default function HomePage() {
               className="text-3xl sm:text-5xl font-bold"
               style={{ fontFamily: 'Syne, sans-serif' }}
             >
-              Everything You Need<br />to Go Green
+              Everything You Need
+              <br />
+              to Go Green
             </h2>
             <p className="text-sm max-w-xs" style={{ color: '#555' }}>
               A complete platform for measuring and reducing your environmental impact.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-px" style={{ border: '1px solid rgba(255,255,255,0.08)', borderRadius: '1rem', overflow: 'hidden' }}>
+          <div
+            className="grid grid-cols-1 sm:grid-cols-2 gap-px"
+            style={{
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: '1rem',
+              overflow: 'hidden',
+            }}
+          >
             {features.map((feature, i) => (
               <div
                 key={feature.title}
@@ -192,8 +217,8 @@ export default function HomePage() {
                   animationDelay: `${i * 0.08}s`,
                   transition: 'background 0.3s',
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#111'}
-                onMouseLeave={(e) => e.currentTarget.style.background = '#0A0A0A'}
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#111')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = '#0A0A0A')}
               >
                 <span
                   className="text-xs font-mono mb-4 block"
@@ -212,7 +237,9 @@ export default function HomePage() {
                 </p>
                 <div
                   className="mt-6 h-px"
-                  style={{ background: 'linear-gradient(90deg, rgba(255,255,255,0.15), transparent)' }}
+                  style={{
+                    background: 'linear-gradient(90deg, rgba(255,255,255,0.15), transparent)',
+                  }}
                 />
               </div>
             ))}
@@ -243,8 +270,12 @@ export default function HomePage() {
                   borderTop: '1px solid rgba(255,255,255,0.07)',
                   animationDelay: `${i * 0.08}s`,
                 }}
-                onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)'; }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)';
+                }}
               >
                 <span
                   className="text-5xl font-bold flex-shrink-0 leading-none"
@@ -276,7 +307,11 @@ export default function HomePage() {
           >
             <div
               className="text-sm font-mono mb-6 inline-block px-3 py-1 rounded-full"
-              style={{ border: '1px solid rgba(255,255,255,0.1)', color: '#555', letterSpacing: '0.1em' }}
+              style={{
+                border: '1px solid rgba(255,255,255,0.1)',
+                color: '#555',
+                letterSpacing: '0.1em',
+              }}
             >
               READY WHEN YOU ARE
             </div>
@@ -287,8 +322,8 @@ export default function HomePage() {
               Ready to Make a Difference?
             </h2>
             <p className="mb-10" style={{ color: '#555' }}>
-              It takes less than 5 minutes to calculate your carbon footprint.
-              The first step to reducing it is knowing it.
+              It takes less than 5 minutes to calculate your carbon footprint. The first step to
+              reducing it is knowing it.
             </p>
             <Link to="/calculator" id="footer-cta">
               <button className="btn-primary !px-12 !py-4 !text-base glow-eco">

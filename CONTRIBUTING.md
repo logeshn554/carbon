@@ -55,6 +55,7 @@ cd frontend && npm test
 ## Reporting Issues
 
 Please open a GitHub Issue with:
+
 - Steps to reproduce
 - Expected vs. actual behaviour
 - Browser/Node.js version

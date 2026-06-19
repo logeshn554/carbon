@@ -70,8 +70,8 @@ function FoodForm({ data, onChange }) {
       <legend className="sr-only">Food and Diet Information</legend>
       <div className="space-y-6">
         <p className="text-sm leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
-          Food production accounts for around 25% of global greenhouse gas emissions.
-          Your diet choice significantly impacts your personal carbon footprint.
+          Food production accounts for around 25% of global greenhouse gas emissions. Your diet
+          choice significantly impacts your personal carbon footprint.
         </p>
 
         <div
@@ -116,7 +116,10 @@ function FoodForm({ data, onChange }) {
                     </p>
                     <p
                       className="text-xs font-mono mt-2"
-                      style={{ color: isSelected ? option.textColor : 'var(--color-text-faint)', opacity: isSelected ? 1 : 0.6 }}
+                      style={{
+                        color: isSelected ? option.textColor : 'var(--color-text-faint)',
+                        opacity: isSelected ? 1 : 0.6,
+                      }}
                     >
                       ~{option.emission} CO₂
                     </p>
@@ -138,7 +141,10 @@ function FoodForm({ data, onChange }) {
         {/* CO₂ comparison bars */}
         <div
           className="rounded-xl p-4"
-          style={{ border: '1px solid rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.02)' }}
+          style={{
+            border: '1px solid rgba(255,255,255,0.05)',
+            background: 'rgba(255,255,255,0.02)',
+          }}
         >
           <p
             className="text-xs uppercase tracking-wider font-medium mb-3"
@@ -151,10 +157,16 @@ function FoodForm({ data, onChange }) {
             const isSelected = data.dietType === option.value;
             return (
               <div key={option.value} className="flex items-center gap-3 mb-2">
-                <span className="text-sm w-24 text-right flex-shrink-0" style={{ color: 'var(--color-text-faint)' }}>
+                <span
+                  className="text-sm w-24 text-right flex-shrink-0"
+                  style={{ color: 'var(--color-text-faint)' }}
+                >
                   {option.label}
                 </span>
-                <div className="flex-1 h-2 rounded-full" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                <div
+                  className="flex-1 h-2 rounded-full"
+                  style={{ background: 'rgba(255,255,255,0.05)' }}
+                >
                   <div
                     className="h-full rounded-full transition-all duration-500"
                     style={{
@@ -164,7 +176,10 @@ function FoodForm({ data, onChange }) {
                     }}
                   />
                 </div>
-                <span className="text-xs w-20 flex-shrink-0" style={{ color: 'var(--color-text-faint)' }}>
+                <span
+                  className="text-xs w-20 flex-shrink-0"
+                  style={{ color: 'var(--color-text-faint)' }}
+                >
                   {option.emission}
                 </span>
               </div>

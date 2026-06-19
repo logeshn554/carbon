@@ -28,12 +28,7 @@ export default function Badge({ children, variant = 'eco', className = '', dot =
         ${className}
       `}
     >
-      {dot && (
-        <span
-          className="w-1.5 h-1.5 rounded-full bg-current"
-          aria-hidden="true"
-        />
-      )}
+      {dot && <span className="w-1.5 h-1.5 rounded-full bg-current" aria-hidden="true" />}
       {children}
     </span>
   );

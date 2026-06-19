@@ -21,6 +21,10 @@ app.use(
       directives: {
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'"],
+        // NOTE: 'unsafe-inline' is required for styleSrc to allow:
+        // 1. Vite's dynamic style injection in development.
+        // 2. Tailwind's utility class injection at runtime.
+        // 3. Google Fonts dynamic CSS stylesheet generation.
         styleSrc: ["'self'", 'https://fonts.googleapis.com', "'unsafe-inline'"],
         fontSrc: ["'self'", 'https://fonts.gstatic.com'],
         connectSrc: [
@@ -35,6 +39,8 @@ app.use(
         upgradeInsecureRequests: [],
       },
     },
+    crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: 'same-origin' },
     hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
     noSniff: true,
     xssFilter: true,
@@ -47,30 +53,32 @@ app.use(
 // ── Permissions-Policy Header ───────────────────────────────────────────────
 // Restrict access to sensitive browser APIs that this application does not use.
 app.use((req, res, next) => {
-  res.setHeader(
-    'Permissions-Policy',
-    'camera=(), microphone=(), geolocation=(), payment=()'
-  );
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
   next();
 });
 
 // ── CORS ─────────────────────────────────────────────────────────────────────
 const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
-const corsOrigins = corsOrigin.split(',').map((o) => o.trim()).filter(Boolean);
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
-      return callback(null, true);
-    }
-    const isAllowed = corsOrigins.some((allowed) => origin === allowed) ||
-                      origin.endsWith('.vercel.app');
-    callback(null, isAllowed);
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-}));
+const corsOrigins = corsOrigin
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+        return callback(null, true);
+      }
+      const isAllowed =
+        corsOrigins.some((allowed) => origin === allowed) || origin.endsWith('.vercel.app');
+      callback(null, isAllowed);
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+  })
+);
 
 // ── Body Parsing ──────────────────────────────────────────────────────────────
 app.use(express.json({ limit: '100kb' }));

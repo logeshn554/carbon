@@ -36,14 +36,22 @@ function EnergyForm({ data, onChange }) {
     if (!data.monthlyElectricityKwh) return 0;
     const renewable = sanitizeInteger(data.renewablePercentage || 0, 0, MAX_RENEWABLE_PERCENT);
     return Math.round(
-      data.monthlyElectricityKwh * MONTHS_PER_YEAR * ELECTRICITY_GRID_FACTOR * (1 - renewable / MAX_RENEWABLE_PERCENT)
+      data.monthlyElectricityKwh *
+        MONTHS_PER_YEAR *
+        ELECTRICITY_GRID_FACTOR *
+        (1 - renewable / MAX_RENEWABLE_PERCENT)
     );
   }, [data.monthlyElectricityKwh, data.renewablePercentage]);
 
   const renewableSavings = useMemo(() => {
     if (!data.monthlyElectricityKwh || !data.renewablePercentage) return 0;
     const renewable = sanitizeInteger(data.renewablePercentage, 0, MAX_RENEWABLE_PERCENT);
-    return Math.round(data.monthlyElectricityKwh * MONTHS_PER_YEAR * ELECTRICITY_GRID_FACTOR * (renewable / MAX_RENEWABLE_PERCENT));
+    return Math.round(
+      data.monthlyElectricityKwh *
+        MONTHS_PER_YEAR *
+        ELECTRICITY_GRID_FACTOR *
+        (renewable / MAX_RENEWABLE_PERCENT)
+    );
   }, [data.monthlyElectricityKwh, data.renewablePercentage]);
 
   return (
@@ -59,8 +67,16 @@ function EnergyForm({ data, onChange }) {
             max={INPUT_LIMITS.monthlyElectricityKwh.max}
             placeholder="200"
             value={data.monthlyElectricityKwh || ''}
-            onChange={(e) => handleChange('monthlyElectricityKwh',
-              sanitizeNumber(e.target.value, INPUT_LIMITS.monthlyElectricityKwh.min, INPUT_LIMITS.monthlyElectricityKwh.max))}
+            onChange={(e) =>
+              handleChange(
+                'monthlyElectricityKwh',
+                sanitizeNumber(
+                  e.target.value,
+                  INPUT_LIMITS.monthlyElectricityKwh.min,
+                  INPUT_LIMITS.monthlyElectricityKwh.max
+                )
+              )
+            }
             hint="Check your electricity bill for kWh usage. UK avg: ~280 kWh/month"
           />
           <div>
@@ -74,15 +90,26 @@ function EnergyForm({ data, onChange }) {
               max={INPUT_LIMITS.renewablePercentage.max}
               step="5"
               value={data.renewablePercentage || 0}
-              onChange={(e) => handleChange('renewablePercentage',
-                sanitizeInteger(e.target.value, INPUT_LIMITS.renewablePercentage.min, INPUT_LIMITS.renewablePercentage.max))}
+              onChange={(e) =>
+                handleChange(
+                  'renewablePercentage',
+                  sanitizeInteger(
+                    e.target.value,
+                    INPUT_LIMITS.renewablePercentage.min,
+                    INPUT_LIMITS.renewablePercentage.max
+                  )
+                )
+              }
               className="w-full mt-2"
               aria-valuemin={0}
               aria-valuemax={MAX_RENEWABLE_PERCENT}
               aria-valuenow={data.renewablePercentage || 0}
               aria-label="Renewable energy percentage"
             />
-            <div className="flex justify-between text-xs mt-1" style={{ color: 'var(--color-text-faint)' }}>
+            <div
+              className="flex justify-between text-xs mt-1"
+              style={{ color: 'var(--color-text-faint)' }}
+            >
               <span>0% (Grid)</span>
               <span className="font-semibold" style={{ color: '#00C27B' }}>
                 {data.renewablePercentage || 0}%
@@ -107,10 +134,19 @@ function EnergyForm({ data, onChange }) {
                 className="w-8 h-8 rounded-lg flex items-center justify-center mx-auto mb-2"
                 style={{ background: `${fact.color}15` }}
               >
-                <Icon name={fact.icon} size={15} style={{ color: fact.color }} className="text-current" />
+                <Icon
+                  name={fact.icon}
+                  size={15}
+                  style={{ color: fact.color }}
+                  className="text-current"
+                />
               </div>
-              <p className="text-xs" style={{ color: 'var(--color-text-faint)' }}>{fact.label}</p>
-              <p className="text-xs font-semibold mt-0.5" style={{ color: fact.color }}>{fact.value}</p>
+              <p className="text-xs" style={{ color: 'var(--color-text-faint)' }}>
+                {fact.label}
+              </p>
+              <p className="text-xs font-semibold mt-0.5" style={{ color: fact.color }}>
+                {fact.value}
+              </p>
             </div>
           ))}
         </div>
@@ -119,17 +155,26 @@ function EnergyForm({ data, onChange }) {
         {data.monthlyElectricityKwh > 0 && (
           <div
             className="rounded-xl p-4 flex items-start gap-3 animate-fade-in"
-            style={{ border: '1px solid rgba(79,142,247,0.18)', background: 'rgba(79,142,247,0.05)' }}
+            style={{
+              border: '1px solid rgba(79,142,247,0.18)',
+              background: 'rgba(79,142,247,0.05)',
+            }}
             aria-live="polite"
             aria-atomic="true"
           >
-            <Icon name="info" size={15} style={{ color: '#4F8EF7' }} className="flex-shrink-0 mt-0.5 text-current" />
+            <Icon
+              name="info"
+              size={15}
+              style={{ color: '#4F8EF7' }}
+              className="flex-shrink-0 mt-0.5 text-current"
+            />
             <p className="text-sm font-medium" style={{ color: '#7aadfa' }}>
               Your energy emissions: ~{nonRenewableEmission.toLocaleString()} kg CO₂/year
               {data.renewablePercentage > 0 && (
                 <span style={{ color: '#00C27B' }}>
-                  {' '}({data.renewablePercentage}% renewable saves{' '}
-                  {renewableSavings.toLocaleString()} kg)
+                  {' '}
+                  ({data.renewablePercentage}% renewable saves {renewableSavings.toLocaleString()}{' '}
+                  kg)
                 </span>
               )}
             </p>

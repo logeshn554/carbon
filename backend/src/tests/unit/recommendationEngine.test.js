@@ -118,7 +118,9 @@ describe('Recommendation Engine', () => {
       const recs = generateRecommendations(heavyUserData, heavyEmissions);
       const priorityOrder = { HIGH: 0, MEDIUM: 1, LOW: 2 };
       for (let i = 1; i < recs.length; i++) {
-        expect(priorityOrder[recs[i].priority]).toBeGreaterThanOrEqual(priorityOrder[recs[i - 1].priority]);
+        expect(priorityOrder[recs[i].priority]).toBeGreaterThanOrEqual(
+          priorityOrder[recs[i - 1].priority]
+        );
       }
     });
 
@@ -129,7 +131,13 @@ describe('Recommendation Engine', () => {
     });
 
     it('handles edge case with no car and no flights', () => {
-      const data = { ...heavyUserData, dailyCarKm: 0, carFuelType: 'none', shortFlightsPerYear: 0, longFlightsPerYear: 0 };
+      const data = {
+        ...heavyUserData,
+        dailyCarKm: 0,
+        carFuelType: 'none',
+        shortFlightsPerYear: 0,
+        longFlightsPerYear: 0,
+      };
       const emissions = { ...heavyEmissions, transportEmission: 100 };
       expect(() => generateRecommendations(data, emissions)).not.toThrow();
     });

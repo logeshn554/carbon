@@ -14,8 +14,18 @@ const PERCENTAGE_MULTIPLIER = 100;
  * @param {string} [props.className=''] - Additional CSS classes
  * @returns {JSX.Element}
  */
-export default function ProgressBar({ value = 0, max = 100, label, showLabel = true, color = 'eco', className = '' }) {
-  const percentage = Math.min(PERCENTAGE_MULTIPLIER, Math.max(0, (value / max) * PERCENTAGE_MULTIPLIER));
+export default function ProgressBar({
+  value = 0,
+  max = 100,
+  label,
+  showLabel = true,
+  color = 'eco',
+  className = '',
+}) {
+  const percentage = Math.min(
+    PERCENTAGE_MULTIPLIER,
+    Math.max(0, (value / max) * PERCENTAGE_MULTIPLIER)
+  );
   const colors = {
     eco: 'linear-gradient(90deg, #10b981, #06b6d4)',
     amber: 'linear-gradient(90deg, #f59e0b, #ef4444)',

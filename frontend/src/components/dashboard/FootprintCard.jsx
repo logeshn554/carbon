@@ -24,9 +24,16 @@ const CATEGORIES = [
  * @returns {JSX.Element}
  */
 export default function FootprintCard({ assessment }) {
-  const { totalEmission, transportEmission, energyEmission, foodEmission, shoppingEmission } = assessment;
-  const vsGlobal = ((totalEmission - GLOBAL_AVERAGE_EMISSION) / GLOBAL_AVERAGE_EMISSION * PERCENTAGE_MULTIPLIER).toFixed(0);
-  const vsTarget = ((totalEmission - TARGET_EMISSION) / TARGET_EMISSION * PERCENTAGE_MULTIPLIER).toFixed(0);
+  const { totalEmission, transportEmission, energyEmission, foodEmission, shoppingEmission } =
+    assessment;
+  const vsGlobal = (
+    ((totalEmission - GLOBAL_AVERAGE_EMISSION) / GLOBAL_AVERAGE_EMISSION) *
+    PERCENTAGE_MULTIPLIER
+  ).toFixed(0);
+  const vsTarget = (
+    ((totalEmission - TARGET_EMISSION) / TARGET_EMISSION) *
+    PERCENTAGE_MULTIPLIER
+  ).toFixed(0);
 
   const values = {
     transport: transportEmission,
@@ -72,9 +79,15 @@ export default function FootprintCard({ assessment }) {
                 {Math.abs(vsGlobal)}%
               </p>
             </div>
-            <p className="text-xs" style={{ color: 'var(--color-text-faint)' }}>vs global avg</p>
+            <p className="text-xs" style={{ color: 'var(--color-text-faint)' }}>
+              vs global avg
+            </p>
           </div>
-          <div className="w-px" style={{ background: 'rgba(255,255,255,0.08)' }} aria-hidden="true" />
+          <div
+            className="w-px"
+            style={{ background: 'rgba(255,255,255,0.08)' }}
+            aria-hidden="true"
+          />
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 mb-0.5">
               <Icon
@@ -90,7 +103,9 @@ export default function FootprintCard({ assessment }) {
                 {Math.abs(vsTarget)}%
               </p>
             </div>
-            <p className="text-xs" style={{ color: 'var(--color-text-faint)' }}>vs Paris target</p>
+            <p className="text-xs" style={{ color: 'var(--color-text-faint)' }}>
+              vs Paris target
+            </p>
           </div>
         </div>
       </div>
@@ -100,7 +115,8 @@ export default function FootprintCard({ assessment }) {
       <div className="grid grid-cols-2 gap-3">
         {CATEGORIES.map((cat) => {
           const val = values[cat.key];
-          const pct = totalEmission > 0 ? ((val / totalEmission) * PERCENTAGE_MULTIPLIER).toFixed(0) : 0;
+          const pct =
+            totalEmission > 0 ? ((val / totalEmission) * PERCENTAGE_MULTIPLIER).toFixed(0) : 0;
           return (
             <div
               key={cat.label}
@@ -112,15 +128,27 @@ export default function FootprintCard({ assessment }) {
             >
               <div className="flex items-center justify-between mb-2">
                 <span className="flex items-center gap-1.5">
-                  <Icon name={cat.icon} size={13} style={{ color: cat.color }} className="text-current" />
-                  <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{cat.label}</span>
+                  <Icon
+                    name={cat.icon}
+                    size={13}
+                    style={{ color: cat.color }}
+                    className="text-current"
+                  />
+                  <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                    {cat.label}
+                  </span>
                 </span>
-                <span className="text-xs" style={{ color: 'var(--color-text-faint)' }}>{pct}%</span>
+                <span className="text-xs" style={{ color: 'var(--color-text-faint)' }}>
+                  {pct}%
+                </span>
               </div>
               <p className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>
                 {formatNumber(val)} kg
               </p>
-              <div className="mt-2 h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}>
+              <div
+                className="mt-2 h-1 rounded-full"
+                style={{ background: 'rgba(255,255,255,0.06)' }}
+              >
                 <div
                   className="h-full rounded-full transition-all duration-700"
                   style={{ width: `${pct}%`, background: cat.color }}

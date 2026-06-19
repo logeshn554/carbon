@@ -33,12 +33,10 @@ export default {
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-hero':
-          'linear-gradient(135deg, #0a0f1a 0%, #0d2137 50%, #0a1a2e 100%)',
+        'gradient-hero': 'linear-gradient(135deg, #0a0f1a 0%, #0d2137 50%, #0a1a2e 100%)',
         'gradient-card':
           'linear-gradient(145deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%)',
-        'gradient-eco':
-          'linear-gradient(135deg, #059669 0%, #0891b2 100%)',
+        'gradient-eco': 'linear-gradient(135deg, #059669 0%, #0891b2 100%)',
       },
       boxShadow: {
         'glow-eco': '0 0 20px rgba(16, 185, 129, 0.3)',
@@ -50,7 +48,7 @@ export default {
         'slide-up': 'slideUp 0.5s ease-out',
         'slide-in-right': 'slideInRight 0.4s ease-out',
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'float': 'float 6s ease-in-out infinite',
+        float: 'float 6s ease-in-out infinite',
         'spin-slow': 'spin 8s linear infinite',
         shimmer: 'shimmer 2s infinite',
       },

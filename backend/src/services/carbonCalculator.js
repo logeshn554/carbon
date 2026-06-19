@@ -6,26 +6,26 @@
 // === Emission Factors ===
 const EMISSION_FACTORS = {
   car: {
-    petrol: 0.21,   // kg CO₂ per km
+    petrol: 0.21, // kg CO₂ per km
     diesel: 0.17,
     electric: 0.047,
     hybrid: 0.105,
     none: 0,
   },
-  publicTransport: 0.089,  // kg CO₂ per km (bus average)
-  train: 0.041,            // kg CO₂ per km
-  electricity: 0.233,      // kg CO₂ per kWh (UK grid 2023)
+  publicTransport: 0.089, // kg CO₂ per km (bus average)
+  train: 0.041, // kg CO₂ per km
+  electricity: 0.233, // kg CO₂ per kWh (UK grid 2023)
   food: {
-    vegan: 1500,           // kg CO₂ per year
+    vegan: 1500, // kg CO₂ per year
     vegetarian: 1700,
     mixed: 2500,
     heavy_meat: 3300,
   },
-  clothing: 33,            // kg CO₂ per clothing item (manufacturing + transport)
-  electronics: 300,        // kg CO₂ per device (avg smartphone/laptop lifecycle)
+  clothing: 33, // kg CO₂ per clothing item (manufacturing + transport)
+  electronics: 300, // kg CO₂ per device (avg smartphone/laptop lifecycle)
   flight: {
-    short_haul: 255,       // kg CO₂ per return flight (< 3 hours, incl. radiative forcing)
-    long_haul: 1620,       // kg CO₂ per return flight (> 3 hours)
+    short_haul: 255, // kg CO₂ per return flight (< 3 hours, incl. radiative forcing)
+    long_haul: 1620, // kg CO₂ per return flight (> 3 hours)
   },
 };
 
@@ -39,7 +39,7 @@ export function calculateTransportEmission(data) {
     dailyCarKm = 0,
     carFuelType = 'none',
     publicTransportKmPerWeek = 0,
-    cyclingKmPerWeek = 0,
+    cyclingKmPerWeek: _cyclingKmPerWeek = 0,
     shortFlightsPerYear = 0,
     longFlightsPerYear = 0,
   } = data;

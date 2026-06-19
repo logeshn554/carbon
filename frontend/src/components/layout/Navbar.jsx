@@ -29,7 +29,6 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-
           {/* Logo */}
           <Link
             to="/"
@@ -65,9 +64,7 @@ export default function Navbar() {
           {/* CTA */}
           <div className="hidden md:flex items-center">
             <Link to="/calculator">
-              <button className="btn-primary !px-5 !py-2 !text-sm">
-                Start Assessment
-              </button>
+              <button className="btn-primary !px-5 !py-2 !text-sm">Start Assessment</button>
             </Link>
           </div>
 
@@ -125,9 +122,7 @@ export default function Navbar() {
             ))}
             <div className="pt-2">
               <Link to="/calculator" onClick={() => setMobileOpen(false)}>
-                <button className="btn-primary w-full !py-2.5 !text-sm">
-                  Start Assessment
-                </button>
+                <button className="btn-primary w-full !py-2.5 !text-sm">Start Assessment</button>
               </Link>
             </div>
           </div>

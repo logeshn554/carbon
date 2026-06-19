@@ -45,7 +45,7 @@ function _analyzeTransport(data, emissions, recs) {
     publicTransportKmPerWeek = 0,
     shortFlightsPerYear = 0,
     longFlightsPerYear = 0,
-    cyclingKmPerWeek = 0,
+    cyclingKmPerWeek: _cyclingKmPerWeek = 0,
   } = data;
 
   const totalFlights = shortFlightsPerYear + longFlightsPerYear;
@@ -99,9 +99,7 @@ function _analyzeTransport(data, emissions, recs) {
   if (dailyCarKm > 15 && publicTransportKmPerWeek < 20 && carFuelType !== 'electric') {
     const carFactor = EMISSION_FACTORS.car[carFuelType] ?? 0.21;
     const potentialPTKm = dailyCarKm * 5; // weekday trips
-    const savings = Math.round(
-      potentialPTKm * 52 * (carFactor - EMISSION_FACTORS.publicTransport)
-    );
+    const savings = Math.round(potentialPTKm * 52 * (carFactor - EMISSION_FACTORS.publicTransport));
     recs.push({
       title: 'Use Public Transport for Commuting',
       description: `Switching even 2 days/week to public transport for your ${dailyCarKm}km daily commute could save ~${savings}kg CO₂/year and reduce traffic stress.`,
@@ -136,7 +134,7 @@ function _analyzeTransport(data, emissions, recs) {
   // 5. Carpool suggestion
   if (dailyCarKm > 20 && publicTransportKmPerWeek < 10 && carFuelType !== 'electric') {
     const carFactor = EMISSION_FACTORS.car[carFuelType] ?? 0.21;
-    const savings = Math.round((dailyCarKm * carFactor * 365) * 0.35);
+    const savings = Math.round(dailyCarKm * carFactor * 365 * 0.35);
     recs.push({
       title: 'Start Carpooling',
       description: `Sharing your commute with just one other person halves both your per-person emissions and fuel costs, saving an estimated ${savings}kg CO₂/year.`,
@@ -195,7 +193,8 @@ function _analyzeEnergy(data, emissions, recs) {
   if (monthlyElectricityKwh > 150) {
     recs.push({
       title: 'Install a Smart Thermostat',
-      description: 'Smart thermostats learn your schedule and can reduce heating and cooling energy use by 10-15%, with typical savings of 150-400kg CO₂/year depending on home size.',
+      description:
+        'Smart thermostats learn your schedule and can reduce heating and cooling energy use by 10-15%, with typical savings of 150-400kg CO₂/year depending on home size.',
       estimatedSavings: Math.round(emissions.energyEmission * 0.12),
       priority: PRIORITY.LOW,
       category: 'energy',
@@ -209,14 +208,16 @@ function _analyzeFood(data, emissions, recs) {
   if (dietType === 'heavy_meat') {
     recs.push({
       title: 'Reduce Red Meat Consumption',
-      description: 'A heavy meat diet generates ~3,300kg CO₂/year from food alone. Cutting beef and lamb to twice a week while keeping other meat saves ~800kg CO₂/year — one of the highest-impact individual changes.',
+      description:
+        'A heavy meat diet generates ~3,300kg CO₂/year from food alone. Cutting beef and lamb to twice a week while keeping other meat saves ~800kg CO₂/year — one of the highest-impact individual changes.',
       estimatedSavings: 800,
       priority: PRIORITY.HIGH,
       category: 'food',
     });
     recs.push({
       title: 'Try Meat-Free Mondays',
-      description: 'Going vegetarian just one day per week saves ~150kg CO₂/year. Extending to 3 meat-free days reduces your diet footprint by over 600kg annually.',
+      description:
+        'Going vegetarian just one day per week saves ~150kg CO₂/year. Extending to 3 meat-free days reduces your diet footprint by over 600kg annually.',
       estimatedSavings: 500,
       priority: PRIORITY.MEDIUM,
       category: 'food',
@@ -226,7 +227,8 @@ function _analyzeFood(data, emissions, recs) {
   if (dietType === 'mixed') {
     recs.push({
       title: 'Adopt a Vegetarian Diet',
-      description: 'Switching from a mixed to vegetarian diet saves ~800kg CO₂/year. Plant proteins like beans, lentils and tofu have 10-20x lower carbon footprints than beef.',
+      description:
+        'Switching from a mixed to vegetarian diet saves ~800kg CO₂/year. Plant proteins like beans, lentils and tofu have 10-20x lower carbon footprints than beef.',
       estimatedSavings: 800,
       priority: PRIORITY.MEDIUM,
       category: 'food',
@@ -236,7 +238,8 @@ function _analyzeFood(data, emissions, recs) {
   if (dietType !== 'vegan') {
     recs.push({
       title: 'Reduce Food Waste',
-      description: 'Around 30% of food is wasted globally. Meal planning, proper storage and composting can reduce your food footprint by 10-15%, saving ~150-300kg CO₂/year.',
+      description:
+        'Around 30% of food is wasted globally. Meal planning, proper storage and composting can reduce your food footprint by 10-15%, saving ~150-300kg CO₂/year.',
       estimatedSavings: Math.round(EMISSION_FACTORS.food[dietType] * 0.12),
       priority: PRIORITY.LOW,
       category: 'food',
@@ -244,7 +247,8 @@ function _analyzeFood(data, emissions, recs) {
 
     recs.push({
       title: 'Choose Local & Seasonal Produce',
-      description: 'Out-of-season produce shipped by air can have 50x higher emissions than local seasonal equivalents. Shopping at farmers markets and choosing seasonal food reduces transport emissions.',
+      description:
+        'Out-of-season produce shipped by air can have 50x higher emissions than local seasonal equivalents. Shopping at farmers markets and choosing seasonal food reduces transport emissions.',
       estimatedSavings: Math.round(EMISSION_FACTORS.food[dietType] * 0.08),
       priority: PRIORITY.LOW,
       category: 'food',
@@ -280,7 +284,8 @@ function _analyzeShopping(data, emissions, recs) {
   if (clothingItemsPerYear > 5 || electronicsItemsPerYear >= 1) {
     recs.push({
       title: 'Choose Products with Lower Carbon Footprints',
-      description: 'Look for products with eco-certifications, made from recycled materials, or manufactured locally. Even small changes in purchasing habits compound over time.',
+      description:
+        'Look for products with eco-certifications, made from recycled materials, or manufactured locally. Even small changes in purchasing habits compound over time.',
       estimatedSavings: Math.round(emissions.shoppingEmission * 0.15),
       priority: PRIORITY.LOW,
       category: 'shopping',

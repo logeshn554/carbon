@@ -24,17 +24,19 @@ export default function RecommendationCard({ recommendation, index }) {
   const priorityInfo = getPriorityInfo(recommendation.priority);
   const iconName = CATEGORY_ICON_MAP[recommendation.category] || 'info';
 
-  const priorityBg = recommendation.priority === 'HIGH'
-    ? 'rgba(244,63,94,0.12)'
-    : recommendation.priority === 'MEDIUM'
-    ? 'rgba(245,158,11,0.12)'
-    : 'rgba(79,142,247,0.12)';
+  const priorityBg =
+    recommendation.priority === 'HIGH'
+      ? 'rgba(244,63,94,0.12)'
+      : recommendation.priority === 'MEDIUM'
+        ? 'rgba(245,158,11,0.12)'
+        : 'rgba(79,142,247,0.12)';
 
-  const priorityColor = recommendation.priority === 'HIGH'
-    ? '#fb7185'
-    : recommendation.priority === 'MEDIUM'
-    ? '#fbbf24'
-    : '#7aadfa';
+  const priorityColor =
+    recommendation.priority === 'HIGH'
+      ? '#fb7185'
+      : recommendation.priority === 'MEDIUM'
+        ? '#fbbf24'
+        : '#7aadfa';
 
   return (
     <div
@@ -48,12 +50,20 @@ export default function RecommendationCard({ recommendation, index }) {
           style={{ background: priorityBg }}
           aria-hidden="true"
         >
-          <Icon name={iconName} size={18} style={{ color: priorityColor }} className="text-current" />
+          <Icon
+            name={iconName}
+            size={18}
+            style={{ color: priorityColor }}
+            className="text-current"
+          />
         </div>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-3 mb-2">
-            <h4 className="text-sm font-semibold leading-snug" style={{ color: 'var(--color-text)' }}>
+            <h4
+              className="text-sm font-semibold leading-snug"
+              style={{ color: 'var(--color-text)' }}
+            >
               {recommendation.title}
             </h4>
             <span

@@ -1,4 +1,4 @@
-import { EMISSION_FACTORS, calculateAllEmissions } from './carbonCalculator.js';
+import { calculateAllEmissions } from './carbonCalculator.js';
 
 /**
  * Simulation Service
@@ -62,7 +62,8 @@ function applyScenario(original, params) {
   // Direct field overrides
   if (params.carFuelType !== undefined) modified.carFuelType = params.carFuelType;
   if (params.dietType !== undefined) modified.dietType = params.dietType;
-  if (params.renewablePercentage !== undefined) modified.renewablePercentage = params.renewablePercentage;
+  if (params.renewablePercentage !== undefined)
+    modified.renewablePercentage = params.renewablePercentage;
 
   // Reduction factors
   if (params.cyclingReductionFactor !== undefined) {
@@ -105,8 +106,6 @@ function applyScenario(original, params) {
  * @returns {Array} sorted simulation results
  */
 export function runMultipleSimulations(assessmentData, scenarios) {
-  const results = scenarios.map(({ name, params }) =>
-    runSimulation(assessmentData, params, name)
-  );
+  const results = scenarios.map(({ name, params }) => runSimulation(assessmentData, params, name));
   return results.sort((a, b) => b.annualSavingsKg - a.annualSavingsKg);
 }

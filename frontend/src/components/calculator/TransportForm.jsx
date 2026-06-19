@@ -36,10 +36,10 @@ function TransportForm({ data, onChange }) {
     const carFactor = CAR_EMISSION_FACTORS[data.carFuelType] ?? 0;
     return {
       car: data.dailyCarKm > 0 ? Math.round(data.dailyCarKm * carFactor * DAYS_PER_YEAR) : 0,
-      shortFlights: data.shortFlightsPerYear > 0
-        ? data.shortFlightsPerYear * FLIGHT_FACTORS.short_haul : 0,
-      longFlights: data.longFlightsPerYear > 0
-        ? data.longFlightsPerYear * FLIGHT_FACTORS.long_haul : 0,
+      shortFlights:
+        data.shortFlightsPerYear > 0 ? data.shortFlightsPerYear * FLIGHT_FACTORS.short_haul : 0,
+      longFlights:
+        data.longFlightsPerYear > 0 ? data.longFlightsPerYear * FLIGHT_FACTORS.long_haul : 0,
     };
   }, [data.dailyCarKm, data.carFuelType, data.shortFlightsPerYear, data.longFlightsPerYear]);
 
@@ -65,9 +65,21 @@ function TransportForm({ data, onChange }) {
             max={INPUT_LIMITS.dailyCarKm.max}
             placeholder="0"
             value={data.dailyCarKm || ''}
-            onChange={(e) => handleChange('dailyCarKm',
-              sanitizeNumber(e.target.value, INPUT_LIMITS.dailyCarKm.min, INPUT_LIMITS.dailyCarKm.max))}
-            hint={data.carFuelType === 'none' ? "Set to 0 if you don't drive" : 'Average km driven per day'}
+            onChange={(e) =>
+              handleChange(
+                'dailyCarKm',
+                sanitizeNumber(
+                  e.target.value,
+                  INPUT_LIMITS.dailyCarKm.min,
+                  INPUT_LIMITS.dailyCarKm.max
+                )
+              )
+            }
+            hint={
+              data.carFuelType === 'none'
+                ? "Set to 0 if you don't drive"
+                : 'Average km driven per day'
+            }
           />
         </div>
 
@@ -80,8 +92,16 @@ function TransportForm({ data, onChange }) {
             max={INPUT_LIMITS.publicTransportKmPerWeek.max}
             placeholder="0"
             value={data.publicTransportKmPerWeek || ''}
-            onChange={(e) => handleChange('publicTransportKmPerWeek',
-              sanitizeNumber(e.target.value, INPUT_LIMITS.publicTransportKmPerWeek.min, INPUT_LIMITS.publicTransportKmPerWeek.max))}
+            onChange={(e) =>
+              handleChange(
+                'publicTransportKmPerWeek',
+                sanitizeNumber(
+                  e.target.value,
+                  INPUT_LIMITS.publicTransportKmPerWeek.min,
+                  INPUT_LIMITS.publicTransportKmPerWeek.max
+                )
+              )
+            }
             hint="Bus, metro, tram — total km per week"
           />
           <Input
@@ -92,8 +112,16 @@ function TransportForm({ data, onChange }) {
             max={INPUT_LIMITS.cyclingKmPerWeek.max}
             placeholder="0"
             value={data.cyclingKmPerWeek || ''}
-            onChange={(e) => handleChange('cyclingKmPerWeek',
-              sanitizeNumber(e.target.value, INPUT_LIMITS.cyclingKmPerWeek.min, INPUT_LIMITS.cyclingKmPerWeek.max))}
+            onChange={(e) =>
+              handleChange(
+                'cyclingKmPerWeek',
+                sanitizeNumber(
+                  e.target.value,
+                  INPUT_LIMITS.cyclingKmPerWeek.min,
+                  INPUT_LIMITS.cyclingKmPerWeek.max
+                )
+              )
+            }
             hint="Cycling produces zero direct emissions"
           />
         </div>
@@ -101,7 +129,10 @@ function TransportForm({ data, onChange }) {
         <div className="section-divider" />
 
         <div>
-          <h3 className="font-semibold mb-4 flex items-center gap-2" style={{ color: 'var(--color-text-muted)' }}>
+          <h3
+            className="font-semibold mb-4 flex items-center gap-2"
+            style={{ color: 'var(--color-text-muted)' }}
+          >
             <Icon name="plane" size={16} />
             Air Travel
           </h3>
@@ -114,8 +145,16 @@ function TransportForm({ data, onChange }) {
               max={INPUT_LIMITS.shortFlightsPerYear.max}
               placeholder="0"
               value={data.shortFlightsPerYear || ''}
-              onChange={(e) => handleChange('shortFlightsPerYear',
-                sanitizeInteger(e.target.value, INPUT_LIMITS.shortFlightsPerYear.min, INPUT_LIMITS.shortFlightsPerYear.max))}
+              onChange={(e) =>
+                handleChange(
+                  'shortFlightsPerYear',
+                  sanitizeInteger(
+                    e.target.value,
+                    INPUT_LIMITS.shortFlightsPerYear.min,
+                    INPUT_LIMITS.shortFlightsPerYear.max
+                  )
+                )
+              }
               hint={`Under 3 hours — ~${FLIGHT_FACTORS.short_haul} kg CO₂ per return flight`}
             />
             <Input
@@ -126,8 +165,16 @@ function TransportForm({ data, onChange }) {
               max={INPUT_LIMITS.longFlightsPerYear.max}
               placeholder="0"
               value={data.longFlightsPerYear || ''}
-              onChange={(e) => handleChange('longFlightsPerYear',
-                sanitizeInteger(e.target.value, INPUT_LIMITS.longFlightsPerYear.min, INPUT_LIMITS.longFlightsPerYear.max))}
+              onChange={(e) =>
+                handleChange(
+                  'longFlightsPerYear',
+                  sanitizeInteger(
+                    e.target.value,
+                    INPUT_LIMITS.longFlightsPerYear.min,
+                    INPUT_LIMITS.longFlightsPerYear.max
+                  )
+                )
+              }
               hint={`Over 3 hours — ~${FLIGHT_FACTORS.long_haul.toLocaleString()} kg CO₂ per return flight`}
             />
           </div>
@@ -141,12 +188,19 @@ function TransportForm({ data, onChange }) {
             aria-live="polite"
             aria-atomic="true"
           >
-            <Icon name="info" size={15} style={{ color: '#00C27B' }} className="flex-shrink-0 mt-0.5 text-current" />
+            <Icon
+              name="info"
+              size={15}
+              style={{ color: '#00C27B' }}
+              className="flex-shrink-0 mt-0.5 text-current"
+            />
             <p className="text-sm font-medium" style={{ color: '#00C27B' }}>
               Quick estimate:
               {preview.car > 0 && ` Car: ~${preview.car.toLocaleString()} kg/yr`}
-              {preview.shortFlights > 0 && ` · Short flights: ~${preview.shortFlights.toLocaleString()} kg/yr`}
-              {preview.longFlights > 0 && ` · Long flights: ~${preview.longFlights.toLocaleString()} kg/yr`}
+              {preview.shortFlights > 0 &&
+                ` · Short flights: ~${preview.shortFlights.toLocaleString()} kg/yr`}
+              {preview.longFlights > 0 &&
+                ` · Long flights: ~${preview.longFlights.toLocaleString()} kg/yr`}
             </p>
           </div>
         )}

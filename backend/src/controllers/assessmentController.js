@@ -180,10 +180,18 @@ export const getAssessmentById = async (req, res, next) => {
       data: {
         ...assessment,
         breakdown: {
-          transport: parseFloat(((assessment.transportEmission / safeTotal) * PERCENTAGE_MULTIPLIER).toFixed(1)),
-          energy: parseFloat(((assessment.energyEmission / safeTotal) * PERCENTAGE_MULTIPLIER).toFixed(1)),
-          food: parseFloat(((assessment.foodEmission / safeTotal) * PERCENTAGE_MULTIPLIER).toFixed(1)),
-          shopping: parseFloat(((assessment.shoppingEmission / safeTotal) * PERCENTAGE_MULTIPLIER).toFixed(1)),
+          transport: parseFloat(
+            ((assessment.transportEmission / safeTotal) * PERCENTAGE_MULTIPLIER).toFixed(1)
+          ),
+          energy: parseFloat(
+            ((assessment.energyEmission / safeTotal) * PERCENTAGE_MULTIPLIER).toFixed(1)
+          ),
+          food: parseFloat(
+            ((assessment.foodEmission / safeTotal) * PERCENTAGE_MULTIPLIER).toFixed(1)
+          ),
+          shopping: parseFloat(
+            ((assessment.shoppingEmission / safeTotal) * PERCENTAGE_MULTIPLIER).toFixed(1)
+          ),
         },
       },
     });

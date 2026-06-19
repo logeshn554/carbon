@@ -39,8 +39,8 @@ export function sanitizeText(str, maxLen = 200) {
   if (typeof str !== 'string') return '';
   return str
     .replace(/<script[^>]*>.*?<\/script>/gis, '') // strip <script> blocks entirely
-    .replace(/<style[^>]*>.*?<\/style>/gis, '')   // strip <style> blocks entirely
-    .replace(/<[^>]*>/g, '')                        // strip remaining HTML tags
+    .replace(/<style[^>]*>.*?<\/style>/gis, '') // strip <style> blocks entirely
+    .replace(/<[^>]*>/g, '') // strip remaining HTML tags
     .trim()
     .slice(0, maxLen);
 }

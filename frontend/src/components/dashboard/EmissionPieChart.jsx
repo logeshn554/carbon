@@ -17,11 +17,7 @@ const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     const d = payload[0].payload;
     return (
-      <div
-        className="glass-card px-4 py-3 text-sm"
-        style={{ minWidth: 160 }}
-        role="tooltip"
-      >
+      <div className="glass-card px-4 py-3 text-sm" style={{ minWidth: 160 }} role="tooltip">
         <p className="font-semibold text-slate-200 mb-1">{d.name}</p>
         <p className="text-slate-300">{formatNumber(d.value)} kg CO₂</p>
         <p className="text-slate-500">{d.percent?.toFixed(1)}% of total</p>
@@ -33,13 +29,15 @@ const CustomTooltip = ({ active, payload }) => {
 
 CustomTooltip.propTypes = {
   active: PropTypes.bool,
-  payload: PropTypes.arrayOf(PropTypes.shape({
-    payload: PropTypes.shape({
-      name: PropTypes.string,
-      value: PropTypes.number,
-      percent: PropTypes.number,
-    }),
-  })),
+  payload: PropTypes.arrayOf(
+    PropTypes.shape({
+      payload: PropTypes.shape({
+        name: PropTypes.string,
+        value: PropTypes.number,
+        percent: PropTypes.number,
+      }),
+    })
+  ),
 };
 
 /**
@@ -64,10 +62,12 @@ const CustomLegend = ({ payload }) => (
 );
 
 CustomLegend.propTypes = {
-  payload: PropTypes.arrayOf(PropTypes.shape({
-    value: PropTypes.string,
-    color: PropTypes.string,
-  })),
+  payload: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.string,
+      color: PropTypes.string,
+    })
+  ),
 };
 
 /**

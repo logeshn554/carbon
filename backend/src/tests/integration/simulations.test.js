@@ -12,20 +12,18 @@ beforeAll(async () => {
     .send({ name: 'Sim Test User', email: `sim-test-${Date.now()}@example.com` });
   testUserId = userRes.body.data.id;
 
-  const assessRes = await request(app)
-    .post('/api/assessments')
-    .send({
-      userId: testUserId,
-      dailyCarKm: 25,
-      carFuelType: 'petrol',
-      shortFlightsPerYear: 3,
-      longFlightsPerYear: 1,
-      monthlyElectricityKwh: 300,
-      renewablePercentage: 0,
-      dietType: 'mixed',
-      clothingItemsPerYear: 15,
-      electronicsItemsPerYear: 2,
-    });
+  const assessRes = await request(app).post('/api/assessments').send({
+    userId: testUserId,
+    dailyCarKm: 25,
+    carFuelType: 'petrol',
+    shortFlightsPerYear: 3,
+    longFlightsPerYear: 1,
+    monthlyElectricityKwh: 300,
+    renewablePercentage: 0,
+    dietType: 'mixed',
+    clothingItemsPerYear: 15,
+    electronicsItemsPerYear: 2,
+  });
   testAssessmentId = assessRes.body.data.id;
 });
 
@@ -105,13 +103,11 @@ describe('Simulations API Integration Tests', () => {
     });
 
     it('should return 404 for non-existent assessment', async () => {
-      const res = await request(app)
-        .post('/api/simulations')
-        .send({
-          assessmentId: 'nonexistent-id',
-          scenarioName: 'Test',
-          scenarioParams: {},
-        });
+      const res = await request(app).post('/api/simulations').send({
+        assessmentId: 'nonexistent-id',
+        scenarioName: 'Test',
+        scenarioParams: {},
+      });
 
       expect(res.status).toBe(404);
     });

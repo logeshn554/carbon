@@ -1,10 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import {
-  getCacheKey,
-  getFromCache,
-  setInCache,
-  clearCache,
-} from '../utils/calculationCache';
+import { getCacheKey, getFromCache, setInCache, clearCache } from '../utils/calculationCache';
 
 describe('calculationCache utility', () => {
   beforeEach(() => {

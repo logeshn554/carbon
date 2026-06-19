@@ -12,6 +12,15 @@
     "no-console": "warn",
     "no-var": "error",
     "prefer-const": "error",
-    "eqeqeq": ["error", "always"]
-  }
+    "eqeqeq": ["error", "always"],
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }]
+  },
+  "overrides": [
+    {
+      "files": ["src/utils/logger.js"],
+      "rules": {
+        "no-console": "off"
+      }
+    }
+  ]
 }

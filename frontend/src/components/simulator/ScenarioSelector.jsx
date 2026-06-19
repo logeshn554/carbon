@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { SIMULATION_SCENARIOS, CATEGORY_COLORS } from '../../utils/constants';
+import { SIMULATION_SCENARIOS } from '../../utils/constants';
 import Button from '../ui/Button';
 
 const categoryColors = {
@@ -46,18 +46,27 @@ export default function ScenarioSelector({ selectedScenario, onSelect, onRun, lo
                   onClick={() => onSelect(scenario)}
                   className={`
                     text-left p-4 rounded-xl border transition-all duration-200
-                    ${isSelected
-                      ? `${categoryColors[category] || 'border-emerald-500/40 bg-emerald-500/8'} border-opacity-100 scale-[1.01]`
-                      : 'border-white/6 bg-white/2 hover:border-white/12 hover:bg-white/5'}
+                    ${
+                      isSelected
+                        ? `${categoryColors[category] || 'border-emerald-500/40 bg-emerald-500/8'} border-opacity-100 scale-[1.01]`
+                        : 'border-white/6 bg-white/2 hover:border-white/12 hover:bg-white/5'
+                    }
                   `}
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl flex-shrink-0" aria-hidden="true">{scenario.icon}</span>
+                    <span className="text-2xl flex-shrink-0" aria-hidden="true">
+                      {scenario.icon}
+                    </span>
                     <div>
-                      <p className={`font-semibold text-sm ${isSelected ? 'text-slate-100' : 'text-slate-300'}`}>
+                      <p
+                        className={`font-semibold text-sm ${isSelected ? 'text-slate-100' : 'text-slate-300'}`}
+                      >
                         {scenario.name}
                       </p>
-                      <p id={`scenario-desc-${scenario.id}`} className="text-xs text-slate-500 mt-0.5">
+                      <p
+                        id={`scenario-desc-${scenario.id}`}
+                        className="text-xs text-slate-500 mt-0.5"
+                      >
                         {scenario.description}
                       </p>
                     </div>
@@ -79,12 +88,7 @@ export default function ScenarioSelector({ selectedScenario, onSelect, onRun, lo
       ))}
 
       {selectedScenario && (
-        <Button
-          onClick={onRun}
-          loading={loading}
-          className="w-full"
-          id="run-simulation-btn"
-        >
+        <Button onClick={onRun} loading={loading} className="w-full" id="run-simulation-btn">
           ▶ Run Simulation: {selectedScenario.name}
         </Button>
       )}

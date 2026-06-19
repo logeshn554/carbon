@@ -1,6 +1,13 @@
 import PropTypes from 'prop-types';
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  ReferenceLine,
 } from 'recharts';
 import { formatDateShort, formatNumber } from '../../utils/formatters';
 import { GLOBAL_AVERAGE_EMISSION, TARGET_EMISSION } from '../../utils/constants';
@@ -69,11 +76,17 @@ export default function TrendChart({ assessments }) {
         </h3>
         <div className="flex items-center gap-4 text-xs">
           <span className="flex items-center gap-1.5 text-slate-500">
-            <span className="w-5 h-0.5 border-t-2 border-dashed border-amber-500/50" aria-hidden="true" />
+            <span
+              className="w-5 h-0.5 border-t-2 border-dashed border-amber-500/50"
+              aria-hidden="true"
+            />
             Global avg
           </span>
           <span className="flex items-center gap-1.5 text-slate-500">
-            <span className="w-5 h-0.5 border-t-2 border-dashed border-emerald-500/50" aria-hidden="true" />
+            <span
+              className="w-5 h-0.5 border-t-2 border-dashed border-emerald-500/50"
+              aria-hidden="true"
+            />
             Paris target
           </span>
         </div>
@@ -83,7 +96,9 @@ export default function TrendChart({ assessments }) {
         <div className="flex items-center justify-center h-48 text-center">
           <div>
             <p className="text-slate-400 text-sm mb-1">📈 Trend chart will appear here</p>
-            <p className="text-slate-600 text-xs">Complete more assessments to track your progress over time</p>
+            <p className="text-slate-600 text-xs">
+              Complete more assessments to track your progress over time
+            </p>
           </div>
         </div>
       ) : (
@@ -91,7 +106,7 @@ export default function TrendChart({ assessments }) {
           style={{ height: 220 }}
           role="img"
           aria-labelledby="trend-chart-title"
-          aria-label={`Footprint trend: ${data.map(d => `${d.date}: ${d.total}kg`).join(', ')}`}
+          aria-label={`Footprint trend: ${data.map((d) => `${d.date}: ${d.total}kg`).join(', ')}`}
         >
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
