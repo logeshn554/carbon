@@ -1,35 +1,35 @@
 import { z } from 'zod';
 import prisma from '../utils/prismaClient.js';
-import { calculateAllEmissions } from '../services/carbonCalculator.js';
-import { calculateScore, compareToAverages } from '../services/scoringService.js';
-import { generateRecommendations } from '../services/recommendationEngine.js';
+import { compareToAverages } from '../services/scoringService.js';
+import { createAssessmentWithRecommendations } from '../services/assessmentService.js';
 import { AppError } from '../middleware/errorHandler.js';
 
 /**
  * Zod schema defining the allowed fields for an assessment request.
- * Used both for validation and as the single source of truth for allowed keys.
+ * `.strict()` instructs Zod to throw a ZodError for any key not declared
+ * in the schema, replacing the old manual ALLOWED_KEYS Set + filter approach.
+ * This is the single source of truth for both validation and allow-listing.
  */
-const assessmentSchema = z.object({
-  userId: z.string().min(1, 'userId is required'),
-  // Transportation
-  dailyCarKm: z.number().min(0).max(1000).default(0),
-  carFuelType: z.enum(['petrol', 'diesel', 'electric', 'hybrid', 'none']).default('none'),
-  publicTransportKmPerWeek: z.number().min(0).max(10000).default(0),
-  cyclingKmPerWeek: z.number().min(0).max(1000).default(0),
-  shortFlightsPerYear: z.number().int().min(0).max(100).default(0),
-  longFlightsPerYear: z.number().int().min(0).max(50).default(0),
-  // Energy
-  monthlyElectricityKwh: z.number().min(0).max(10000).default(0),
-  renewablePercentage: z.number().min(0).max(100).default(0),
-  // Food
-  dietType: z.enum(['vegan', 'vegetarian', 'mixed', 'heavy_meat']).default('mixed'),
-  // Shopping
-  clothingItemsPerYear: z.number().int().min(0).max(500).default(0),
-  electronicsItemsPerYear: z.number().int().min(0).max(50).default(0),
-});
-
-/** @constant {Set<string>} ALLOWED_KEYS - The set of keys the schema accepts */
-const ALLOWED_KEYS = new Set(Object.keys(assessmentSchema.shape));
+const assessmentSchema = z
+  .object({
+    userId: z.string().min(1, 'userId is required'),
+    // Transportation
+    dailyCarKm: z.number().min(0).max(1000).default(0),
+    carFuelType: z.enum(['petrol', 'diesel', 'electric', 'hybrid', 'none']).default('none'),
+    publicTransportKmPerWeek: z.number().min(0).max(10000).default(0),
+    cyclingKmPerWeek: z.number().min(0).max(1000).default(0),
+    shortFlightsPerYear: z.number().int().min(0).max(100).default(0),
+    longFlightsPerYear: z.number().int().min(0).max(50).default(0),
+    // Energy
+    monthlyElectricityKwh: z.number().min(0).max(10000).default(0),
+    renewablePercentage: z.number().min(0).max(100).default(0),
+    // Food
+    dietType: z.enum(['vegan', 'vegetarian', 'mixed', 'heavy_meat']).default('mixed'),
+    // Shopping
+    clothingItemsPerYear: z.number().int().min(0).max(500).default(0),
+    electronicsItemsPerYear: z.number().int().min(0).max(50).default(0),
+  })
+  .strict();
 
 /**
  * Percentage divisor for emission breakdown calculation.
@@ -38,101 +38,48 @@ const ALLOWED_KEYS = new Set(Object.keys(assessmentSchema.shape));
 const PERCENTAGE_MULTIPLIER = 100;
 
 /**
- * Create a new carbon footprint assessment.
- * Validates input, auto-upserts user if not found, calculates emissions,
- * generates recommendations, and saves everything in a Prisma transaction.
+ * Format a Zod unknown-keys error into the message format the tests expect.
+ * Zod's `.strict()` produces an "Unrecognized key(s) in object" message;
+ * this helper translates it to "Unknown fields: X, Y. Only these fields …"
+ * so existing integration test assertions continue to pass.
  *
- * @param {import('express').Request} req - Express request (body must match assessmentSchema)
- * @param {import('express').Response} res - Express response
- * @param {import('express').NextFunction} next - Express next middleware
- * @returns {Promise<void>}
+ * @param {import('zod').ZodError} zodError
+ * @param {string[]} allowedKeys
+ * @returns {string} human-readable message
+ */
+function buildUnknownKeysMessage(zodError, allowedKeys) {
+  const unknownKeyIssues = zodError.issues.filter((i) => i.code === 'unrecognized_keys');
+  if (unknownKeyIssues.length === 0) return zodError.message;
+
+  const unknownKeys = unknownKeyIssues.flatMap((i) => i.keys);
+  return (
+    `Unknown fields: ${unknownKeys.join(', ')}. ` +
+    `Only these fields are accepted: ${allowedKeys.join(', ')}`
+  );
+}
+
+/** Ordered list of accepted field names (stable for error messages). */
+const ALLOWED_KEYS = Object.keys(assessmentSchema._def.shape());
+
+/**
+ * Create a new carbon footprint assessment.
+ * This is a thin HTTP adapter — business logic lives in assessmentService.
+ *
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
  */
 export const createAssessment = async (req, res, next) => {
   try {
-    // ── Unknown-key guard ─────────────────────────────────────────────────
-    // Reject any keys not defined in the Zod schema to prevent payload
-    // pollution or accidental data leakage from over-posting attacks.
-    const unknownKeys = Object.keys(req.body).filter((key) => !ALLOWED_KEYS.has(key));
-    if (unknownKeys.length > 0) {
-      throw new AppError(
-        `Unknown fields: ${unknownKeys.join(', ')}. Only these fields are accepted: ${[...ALLOWED_KEYS].join(', ')}`,
-        400
-      );
+    // Zod .strict() rejects unknown keys at parse time — no manual key filter needed.
+    const parseResult = assessmentSchema.safeParse(req.body);
+    if (!parseResult.success) {
+      const message = buildUnknownKeysMessage(parseResult.error, ALLOWED_KEYS);
+      throw new AppError(message, 400);
     }
+    const data = parseResult.data;
 
-    const data = assessmentSchema.parse(req.body);
-
-    // Auto-upsert user — if frontend registration failed or DB was wiped,
-    // create the user on the fly so the assessment never fails with "User not found".
-    let user = await prisma.user.findUnique({ where: { id: data.userId } });
-
-    // effectiveUserId avoids mutating the Zod-parsed `data` object.
-    let effectiveUserId = data.userId;
-
-    if (!user) {
-      // NOTE: The email pattern `${id}@ecoguide.ai` is a synthetic, non-PII
-      // placeholder used only as a unique key for anonymous user upsert.
-      // It is never displayed to end users nor sent in any communications.
-      user = await prisma.user.upsert({
-        where: { email: `${data.userId}@ecoguide.ai` },
-        update: {},
-        create: {
-          name: 'Anonymous',
-          email: `${data.userId}@ecoguide.ai`,
-        },
-      });
-      // Use the actual DB-assigned id for this assessment
-      effectiveUserId = user.id;
-    }
-
-    // Calculate emissions
-    const emissions = calculateAllEmissions(data);
-    const score = calculateScore(emissions.totalEmission);
-
-    // Generate recommendations
-    const recs = generateRecommendations(data, emissions);
-
-    // Save assessment and recommendations in a transaction.
-    // All Prisma queries below use parameterized inputs via the Prisma ORM,
-    // which prevents SQL injection by design — values are never interpolated
-    // into raw SQL strings.
-    const assessment = await prisma.$transaction(async (tx) => {
-      const created = await tx.assessment.create({
-        data: {
-          userId: effectiveUserId,
-          dailyCarKm: data.dailyCarKm,
-          carFuelType: data.carFuelType,
-          publicTransportKmPerWeek: data.publicTransportKmPerWeek,
-          cyclingKmPerWeek: data.cyclingKmPerWeek,
-          shortFlightsPerYear: data.shortFlightsPerYear,
-          longFlightsPerYear: data.longFlightsPerYear,
-          monthlyElectricityKwh: data.monthlyElectricityKwh,
-          renewablePercentage: data.renewablePercentage,
-          dietType: data.dietType,
-          clothingItemsPerYear: data.clothingItemsPerYear,
-          electronicsItemsPerYear: data.electronicsItemsPerYear,
-          transportEmission: emissions.transportEmission,
-          energyEmission: emissions.energyEmission,
-          foodEmission: emissions.foodEmission,
-          shoppingEmission: emissions.shoppingEmission,
-          totalEmission: emissions.totalEmission,
-          sustainabilityScore: score,
-          recommendations: {
-            create: recs.map((r) => ({
-              title: r.title,
-              description: r.description,
-              estimatedSavings: r.estimatedSavings,
-              priority: r.priority,
-              category: r.category,
-            })),
-          },
-        },
-        include: {
-          recommendations: { orderBy: { estimatedSavings: 'desc' } },
-        },
-      });
-      return created;
-    });
+    const { assessment, emissions, score } = await createAssessmentWithRecommendations(data);
 
     res.status(201).json({
       success: true,
@@ -253,6 +200,10 @@ export const compareAssessment = async (req, res, next) => {
     if (!assessment) throw new AppError('Assessment not found', 404);
 
     const comparison = compareToAverages(assessment.totalEmission);
+
+    // Cache-Control: once an assessment is created its emissions don't change.
+    // Allow CDN / browser to cache this response for up to 5 minutes.
+    res.set('Cache-Control', 'public, max-age=300, stale-while-revalidate=60');
 
     res.json({
       success: true,

@@ -43,7 +43,6 @@ const PHRASES = [
 ];
 
 function LoadingSequence() {
-
   const [currentIdx, setCurrentIdx] = useState(0);
 
   useEffect(() => {

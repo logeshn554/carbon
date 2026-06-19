@@ -12,8 +12,8 @@ export default function NotFoundPage() {
           <span className="gradient-text">404</span> — Lost in the Forest
         </h1>
         <p className="text-slate-400 leading-relaxed mb-8">
-          This page seems to have gone carbon-negative and disappeared. Let&apos;s get you back on the
-          right path.
+          This page seems to have gone carbon-negative and disappeared. Let&apos;s get you back on
+          the right path.
         </p>
         <div className="flex gap-4 justify-center flex-wrap">
           <Link to="/">

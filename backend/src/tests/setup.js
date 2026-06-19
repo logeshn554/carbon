@@ -1,4 +1,4 @@
-import { vi, beforeEach } from 'vitest';
+import { vi } from 'vitest';
 
 // Stateful in-memory database simulation for testing
 const db = {
@@ -10,6 +10,19 @@ const db = {
 
 let idCounter = 1;
 const nextId = (prefix) => `${prefix}_${idCounter++}`;
+
+/**
+ * Reset the mock database to a clean state.
+ * Integration test files call this in their own beforeEach to ensure
+ * per-test isolation without clobbering fixtures created by beforeAll.
+ */
+export function resetDb() {
+  db.users = [];
+  db.assessments = [];
+  db.recommendations = [];
+  db.simulations = [];
+  idCounter = 1;
+}
 
 const mockPrisma = {
   $transaction: async (fn) => fn(mockPrisma),
@@ -166,12 +179,4 @@ vi.mock('../utils/prismaClient.js', () => {
   return {
     default: mockPrisma,
   };
-});
-
-beforeEach(() => {
-  db.users = [];
-  db.assessments = [];
-  db.recommendations = [];
-  db.simulations = [];
-  idCounter = 1;
 });

@@ -1,12 +1,17 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeEach, afterAll } from 'vitest';
 import request from 'supertest';
 import app from '../../app.js';
 import prisma from '../../utils/prismaClient.js';
+import { resetDb } from '../setup.js';
 
 let testUserId;
 let testAssessmentId;
 
-beforeAll(async () => {
+// Re-seed fixtures before EVERY test so each test gets a clean DB with data.
+// This prevents test-order dependencies and cures the beforeEach reset bug.
+beforeEach(async () => {
+  resetDb();
+
   const userRes = await request(app)
     .post('/api/users')
     .send({ name: 'Rec Test User', email: `rec-test-${Date.now()}@example.com` });
@@ -28,9 +33,6 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  if (testUserId) {
-    await prisma.user.delete({ where: { id: testUserId } }).catch(() => {});
-  }
   await prisma.$disconnect();
 });
 

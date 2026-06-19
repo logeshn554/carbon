@@ -1,12 +1,17 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeEach, afterAll } from 'vitest';
 import request from 'supertest';
 import app from '../../app.js';
 import prisma from '../../utils/prismaClient.js';
+import { resetDb } from '../setup.js';
 
 let testUserId;
 let testAssessmentId;
 
-beforeAll(async () => {
+// Re-seed fixtures before EVERY test so each test gets a clean DB with data.
+// This prevents test-order dependencies and cures the beforeEach reset bug.
+beforeEach(async () => {
+  resetDb();
+
   const userRes = await request(app)
     .post('/api/users')
     .send({ name: 'Sim Test User', email: `sim-test-${Date.now()}@example.com` });
@@ -28,9 +33,6 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  if (testUserId) {
-    await prisma.user.delete({ where: { id: testUserId } }).catch(() => {});
-  }
   await prisma.$disconnect();
 });
 
@@ -114,20 +116,17 @@ describe('Simulations API Integration Tests', () => {
   });
 
   describe('GET /api/simulations/:id', () => {
-    let simulationId;
-
-    beforeAll(async () => {
-      const res = await request(app)
+    it('should retrieve a simulation by id', async () => {
+      // Create a simulation first, then retrieve it
+      const createRes = await request(app)
         .post('/api/simulations')
         .send({
           assessmentId: testAssessmentId,
           scenarioName: 'Solar Panels',
           scenarioParams: { renewablePercentage: 80 },
         });
-      simulationId = res.body.data.id;
-    });
+      const simulationId = createRes.body.data.id;
 
-    it('should retrieve a simulation by id', async () => {
       const res = await request(app).get(`/api/simulations/${simulationId}`);
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);

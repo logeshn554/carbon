@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeEach, afterAll } from 'vitest';
 import request from 'supertest';
 import app from '../../app.js';
 import prisma from '../../utils/prismaClient.js';
+import { resetDb } from '../setup.js';
 
 let testUserId;
 let testAssessmentId;
@@ -20,19 +21,22 @@ const validAssessmentData = {
   electronicsItemsPerYear: 1,
 };
 
-beforeAll(async () => {
-  // Create a test user
+// Seed a fresh user + assessment before every test for complete isolation
+beforeEach(async () => {
+  resetDb();
+
   const userRes = await request(app)
     .post('/api/users')
     .send({ name: 'Test User', email: `test-${Date.now()}@example.com` });
   testUserId = userRes.body.data.id;
+
+  const assessRes = await request(app)
+    .post('/api/assessments')
+    .send({ ...validAssessmentData, userId: testUserId });
+  testAssessmentId = assessRes.body.data.id;
 });
 
 afterAll(async () => {
-  // Clean up test data
-  if (testUserId) {
-    await prisma.user.delete({ where: { id: testUserId } }).catch(() => {});
-  }
   await prisma.$disconnect();
 });
 
@@ -50,7 +54,6 @@ describe('Assessment API Integration Tests', () => {
       expect(res.body.data).toHaveProperty('sustainabilityScore');
       expect(res.body.data).toHaveProperty('recommendations');
       expect(res.body.data.recommendations.length).toBeGreaterThan(0);
-      testAssessmentId = res.body.data.id;
     });
 
     it('should calculate non-zero emissions', async () => {
@@ -157,6 +160,53 @@ describe('Assessment API Integration Tests', () => {
 
       expect(res.status).toBe(201);
       expect(res.body.success).toBe(true);
+    });
+
+    // ── Edge cases ────────────────────────────────────────────────────────
+    it('should handle zero-emission user (all zeros + vegan)', async () => {
+      const res = await request(app).post('/api/assessments').send({
+        userId: testUserId,
+        dailyCarKm: 0,
+        carFuelType: 'none',
+        publicTransportKmPerWeek: 0,
+        cyclingKmPerWeek: 0,
+        shortFlightsPerYear: 0,
+        longFlightsPerYear: 0,
+        monthlyElectricityKwh: 0,
+        renewablePercentage: 0,
+        dietType: 'vegan',
+        clothingItemsPerYear: 0,
+        electronicsItemsPerYear: 0,
+      });
+
+      expect(res.status).toBe(201);
+      expect(res.body.data.transportEmission).toBe(0);
+      expect(res.body.data.energyEmission).toBe(0);
+      expect(res.body.data.shoppingEmission).toBe(0);
+      // Vegan diet always has a baseline food emission
+      expect(res.body.data.foodEmission).toBeGreaterThan(0);
+      expect(res.body.data.sustainabilityScore).toBe(100);
+    });
+
+    it('should handle max-boundary values (dailyCarKm=1000, longFlightsPerYear=50)', async () => {
+      const res = await request(app).post('/api/assessments').send({
+        userId: testUserId,
+        dailyCarKm: 1000,
+        carFuelType: 'petrol',
+        publicTransportKmPerWeek: 10000,
+        cyclingKmPerWeek: 1000,
+        shortFlightsPerYear: 100,
+        longFlightsPerYear: 50,
+        monthlyElectricityKwh: 10000,
+        renewablePercentage: 100,
+        dietType: 'heavy_meat',
+        clothingItemsPerYear: 500,
+        electronicsItemsPerYear: 50,
+      });
+
+      expect(res.status).toBe(201);
+      expect(res.body.data.totalEmission).toBeGreaterThan(0);
+      expect(res.body.data.sustainabilityScore).toBeGreaterThanOrEqual(0);
     });
   });
 

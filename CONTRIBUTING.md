@@ -60,6 +60,18 @@ Please open a GitHub Issue with:
 - Expected vs. actual behaviour
 - Browser/Node.js version
 
+## Assumptions & Anonymous Sessions
+
+EcoGuide AI operates without user accounts. This means:
+
+- **Session identity** is an anonymous UUID generated on first visit and stored in `localStorage`. Clearing browser storage is equivalent to "logging out".
+- **Cross-device**: There is no sync across devices. Each browser gets its own independent session UUID and history.
+- **No authentication**: The backend accepts any UUID as a userId. The `POST /api/assessments` endpoint auto-creates a placeholder user record if the UUID is unknown (e.g. after a DB wipe or first use), so data is never silently lost.
+- **Synthetic emails**: When the backend creates a placeholder user it generates `${uuid}@ecoguide.ai` as a unique DB key. This is never used for email communication — it exists only to satisfy the database unique constraint.
+- **Privacy by design**: No names, real emails, or personally identifiable information are collected at any point. All data can be cleared by the user at any time through browser storage settings.
+
+If you extend the platform to support real accounts (e.g. OAuth), update the `useUser` hook, the `/api/users` route, and the Prisma `User` model — and remove the synthetic email fallback in `assessmentService.js`.
+
 ## License
 
 By contributing, you agree your contributions will be licensed under the [MIT License](./LICENSE).

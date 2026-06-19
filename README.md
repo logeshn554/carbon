@@ -260,6 +260,22 @@ EcoGuide AI uses a **deterministic decision-tree heuristics rules engine** (`rec
 - **Efficiency**: The local execution runs in <1ms without network roundtrips, consuming minimal CPU cycles.
 - **Eco-friendly**: Running AI inference on GPUs has a substantial carbon footprint. A rules engine is highly performant and produces virtually zero computing emissions, aligning with the platform's environmental mission.
 
+### Context-Based Decision Trace (Concrete Example)
+
+The engine makes **logical decisions based on each user's specific input context** — not generic advice. Here is an exact trace for a sample user:
+
+**User Profile**: `dailyCarKm=20`, `carFuelType='petrol'`, `shortFlightsPerYear=3`, `dietType='mixed'`, `monthlyElectricityKwh=300`, `renewablePercentage=10`
+
+| Rule Branch                  | Condition (from user input)                                                 | Action Taken                                                                                                            |
+| ---------------------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Transport → EV Switch        | `dailyCarKm (20) > 10` **AND** `carFuelType === 'petrol'`                   | Fires ✅. Computes savings: `(20 × 0.21 − 20 × 0.047) × 365 = 1,189 kg/yr`. Priority → **HIGH** (>1500kg? No → MEDIUM). |
+| Transport → Cycling          | `dailyCarKm (20) > 3` **AND** `carFuelType !== 'none'`                      | Fires ✅. Estimates cyclable km: `min(20×0.3, 5) = 5`. Savings: `5 × 0.21 × 365 = 384 kg`.                              |
+| Transport → Flight Reduction | `totalFlights (3) >= 2`                                                     | Fires ✅. `3 flights × ~255 kg × 0.5 reduction = 383 kg saved`. Priority → MEDIUM.                                      |
+| Energy → Renewable Tariff    | `renewablePercentage (10) < 50` **AND** `monthlyElectricityKwh (300) > 100` | Fires ✅. Current emission: `300×12×0.233×0.9 = 754 kg`. Savings at 100% renewable: `~683 kg`. Priority → **HIGH**.     |
+| Food → Vegetarian Option     | `dietType === 'mixed'`                                                      | Fires ✅. Fixed saving: `800 kg/yr`. Priority → MEDIUM.                                                                 |
+
+Each recommendation description is then personalized with the user's **exact numbers** (km, kWh, items) — not template strings.
+
 ---
 
 ## Compression & Efficiency

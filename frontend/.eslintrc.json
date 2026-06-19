@@ -29,6 +29,12 @@
       "rules": {
         "no-console": "off"
       }
+    },
+    {
+      "files": ["vite.config.js", "postcss.config.js"],
+      "env": {
+        "node": true
+      }
     }
   ]
 }

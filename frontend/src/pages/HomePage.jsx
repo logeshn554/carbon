@@ -58,7 +58,6 @@ const steps = [
   },
 ];
 
-
 function AnimatedStat({ value, label, delay = 0 }) {
   const [visible, setVisible] = useState(false);
   useEffect(() => {

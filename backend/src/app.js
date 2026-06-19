@@ -15,6 +15,12 @@ const app = express();
 app.set('trust proxy', 1);
 
 // ── Security Headers (Helmet) ─────────────────────────────────────────────────
+// BACKEND_PUBLIC_URL: the public URL of this API server.
+// Keeping it in an env var means the CSP isn't hard-coded to one Railway deployment.
+// Falls back to the original Railway URL so existing deployments keep working.
+const backendPublicUrl =
+  process.env.BACKEND_PUBLIC_URL || 'https://carbon-production-49fd.up.railway.app';
+
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -27,12 +33,7 @@ app.use(
         // 3. Google Fonts dynamic CSS stylesheet generation.
         styleSrc: ["'self'", 'https://fonts.googleapis.com', "'unsafe-inline'"],
         fontSrc: ["'self'", 'https://fonts.gstatic.com'],
-        connectSrc: [
-          "'self'",
-          'https://carbon-production-49fd.up.railway.app',
-          '*.vercel.app',
-          'http://localhost:*',
-        ],
+        connectSrc: ["'self'", backendPublicUrl, '*.vercel.app', 'http://localhost:*'],
         imgSrc: ["'self'", 'data:'],
         objectSrc: ["'none'"],
         frameSrc: ["'none'"],
@@ -40,12 +41,13 @@ app.use(
       },
     },
     crossOriginEmbedderPolicy: false,
+    crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
     crossOriginResourcePolicy: { policy: 'same-origin' },
     hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
     noSniff: true,
-    xssFilter: true,
+    // xssFilter removed — deprecated in Helmet 7 and no longer effective in modern browsers.
     referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-    permittedCrossDomainPolicies: false,
+    // permittedCrossDomainPolicies removed — was a no-op (false is not a valid option).
     frameguard: { action: 'deny' },
   })
 );

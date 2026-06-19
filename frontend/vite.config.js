@@ -9,6 +9,27 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (
+              id.includes('recharts') ||
+              id.includes('d3') ||
+              id.includes('react-resize-detector') ||
+              id.includes('internmap') ||
+              id.includes('robust-predicates') ||
+              id.includes('delaunator')
+            ) {
+              return 'vendor-recharts';
+            }
+            return 'vendor';
+          }
+        },
+      },
+    },
+  },
   server: {
     port: 5173,
     proxy: {
