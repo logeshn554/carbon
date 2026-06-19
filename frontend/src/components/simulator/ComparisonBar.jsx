@@ -1,9 +1,21 @@
+import PropTypes from 'prop-types';
 import { formatNumber } from '../../utils/formatters';
 
+/** @constant {number} PERCENTAGE_MULTIPLIER - Used in percentage calculations */
+const PERCENTAGE_MULTIPLIER = 100;
+
+/**
+ * ComparisonBar — displays a visual before/after comparison of emission values.
+ * @param {Object} props
+ * @param {number} props.original - Original emission value in kg
+ * @param {number} props.projected - Projected emission value in kg
+ * @param {React.ReactNode} [props.label=''] - Label text or element
+ * @returns {JSX.Element}
+ */
 export default function ComparisonBar({ original, projected, label = '' }) {
   const max = Math.max(original, projected, 1);
-  const originalPct = (original / max) * 100;
-  const projectedPct = (projected / max) * 100;
+  const originalPct = (original / max) * PERCENTAGE_MULTIPLIER;
+  const projectedPct = (projected / max) * PERCENTAGE_MULTIPLIER;
   const isReduction = projected < original;
 
   return (
@@ -59,3 +71,9 @@ export default function ComparisonBar({ original, projected, label = '' }) {
     </div>
   );
 }
+
+ComparisonBar.propTypes = {
+  original: PropTypes.number.isRequired,
+  projected: PropTypes.number.isRequired,
+  label: PropTypes.node,
+};

@@ -137,14 +137,6 @@ export default function CalculatorPage() {
     return (
       <div className="min-h-[75vh] flex items-center justify-center px-4 animate-fade-in">
         <Card className="max-w-md w-full p-8 text-center relative overflow-hidden scan-line" style={{ borderColor: 'rgba(16, 185, 129, 0.2)' }}>
-          {/* Style injection for progress bar keyframe */}
-          <style dangerouslySetInnerHTML={{__html: `
-            @keyframes progressFill {
-              from { width: 0%; }
-              to { width: 98%; }
-            }
-          `}} />
-
           {/* Glow effect */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full blur-3xl opacity-20 pointer-events-none" style={{ background: 'radial-gradient(circle, #10B981 0%, transparent 70%)' }} />
 

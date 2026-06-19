@@ -1,6 +1,13 @@
-import { formatEmissionTonnes, formatNumber } from '../../utils/formatters';
+import PropTypes from 'prop-types';
+import { formatNumber } from '../../utils/formatters';
 import { GLOBAL_AVERAGE_EMISSION, TARGET_EMISSION } from '../../utils/constants';
 import Icon from '../ui/Icons';
+
+/** @constant {number} PERCENTAGE_MULTIPLIER - Used in percentage calculations */
+const PERCENTAGE_MULTIPLIER = 100;
+
+/** @constant {number} TONNES_DIVISOR - Converts kg to tonnes */
+const TONNES_DIVISOR = 1000;
 
 const CATEGORIES = [
   { label: 'Transport', key: 'transport', icon: 'transport', color: '#00C27B' },
@@ -9,10 +16,17 @@ const CATEGORIES = [
   { label: 'Shopping', key: 'shopping', icon: 'shopping', color: '#FB923C' },
 ];
 
+/**
+ * FootprintCard — displays the annual carbon footprint headline stat
+ * with category breakdown bars and benchmark comparisons.
+ * @param {Object} props
+ * @param {Object} props.assessment - The full assessment record
+ * @returns {JSX.Element}
+ */
 export default function FootprintCard({ assessment }) {
   const { totalEmission, transportEmission, energyEmission, foodEmission, shoppingEmission } = assessment;
-  const vsGlobal = ((totalEmission - GLOBAL_AVERAGE_EMISSION) / GLOBAL_AVERAGE_EMISSION * 100).toFixed(0);
-  const vsTarget = ((totalEmission - TARGET_EMISSION) / TARGET_EMISSION * 100).toFixed(0);
+  const vsGlobal = ((totalEmission - GLOBAL_AVERAGE_EMISSION) / GLOBAL_AVERAGE_EMISSION * PERCENTAGE_MULTIPLIER).toFixed(0);
+  const vsTarget = ((totalEmission - TARGET_EMISSION) / TARGET_EMISSION * PERCENTAGE_MULTIPLIER).toFixed(0);
 
   const values = {
     transport: transportEmission,
@@ -35,7 +49,7 @@ export default function FootprintCard({ assessment }) {
           className="text-6xl font-bold gradient-text mb-1"
           style={{ fontFamily: 'Syne, sans-serif' }}
         >
-          {(totalEmission / 1000).toFixed(2)}
+          {(totalEmission / TONNES_DIVISOR).toFixed(2)}
         </p>
         <p className="text-lg" style={{ color: 'var(--color-text-muted)' }}>
           tonnes CO₂e / year
@@ -86,7 +100,7 @@ export default function FootprintCard({ assessment }) {
       <div className="grid grid-cols-2 gap-3">
         {CATEGORIES.map((cat) => {
           const val = values[cat.key];
-          const pct = totalEmission > 0 ? ((val / totalEmission) * 100).toFixed(0) : 0;
+          const pct = totalEmission > 0 ? ((val / totalEmission) * PERCENTAGE_MULTIPLIER).toFixed(0) : 0;
           return (
             <div
               key={cat.label}
@@ -121,3 +135,13 @@ export default function FootprintCard({ assessment }) {
     </div>
   );
 }
+
+FootprintCard.propTypes = {
+  assessment: PropTypes.shape({
+    totalEmission: PropTypes.number.isRequired,
+    transportEmission: PropTypes.number.isRequired,
+    energyEmission: PropTypes.number.isRequired,
+    foodEmission: PropTypes.number.isRequired,
+    shoppingEmission: PropTypes.number.isRequired,
+  }).isRequired,
+};

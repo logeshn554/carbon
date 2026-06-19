@@ -118,6 +118,46 @@ describe('Assessment API Integration Tests', () => {
       expect(res.body.data.breakdown).toHaveProperty('food');
       expect(res.body.data.breakdown).toHaveProperty('shopping');
     });
+
+    // ── Unknown-key guard tests ────────────────────────────────────────────
+    it('should return 400 when request body contains unknown fields', async () => {
+      const res = await request(app)
+        .post('/api/assessments')
+        .send({
+          ...validAssessmentData,
+          userId: testUserId,
+          hackerField: 'malicious',
+          anotherBadField: 123,
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.error).toContain('Unknown fields');
+      expect(res.body.error).toContain('hackerField');
+      expect(res.body.error).toContain('anotherBadField');
+    });
+
+    it('should return 400 with a single unknown field', async () => {
+      const res = await request(app)
+        .post('/api/assessments')
+        .send({
+          ...validAssessmentData,
+          userId: testUserId,
+          isAdmin: true,
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error).toContain('isAdmin');
+    });
+
+    it('should accept valid data with no unknown fields', async () => {
+      const res = await request(app)
+        .post('/api/assessments')
+        .send({ ...validAssessmentData, userId: testUserId });
+
+      expect(res.status).toBe(201);
+      expect(res.body.success).toBe(true);
+    });
   });
 
   describe('GET /api/assessments/:id', () => {
@@ -152,6 +192,61 @@ describe('Assessment API Integration Tests', () => {
     it('should return 404 for non-existent user', async () => {
       const res = await request(app).get('/api/assessments/user/nonexistent-id');
       expect(res.status).toBe(404);
+    });
+  });
+
+  // ── Compare endpoint tests ──────────────────────────────────────────────────
+  describe('GET /api/assessments/:id/compare', () => {
+    it('should return comparison data for an existing assessment', async () => {
+      const res = await request(app).get(`/api/assessments/${testAssessmentId}/compare`);
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data).toHaveProperty('assessmentId', testAssessmentId);
+      expect(res.body.data).toHaveProperty('totalEmission');
+      expect(res.body.data).toHaveProperty('sustainabilityScore');
+      expect(res.body.data).toHaveProperty('comparison');
+    });
+
+    it('should return comparison object with all benchmark fields', async () => {
+      const res = await request(app).get(`/api/assessments/${testAssessmentId}/compare`);
+      const { comparison } = res.body.data;
+      expect(comparison).toHaveProperty('vsGlobalAverage');
+      expect(comparison).toHaveProperty('vsUkAverage');
+      expect(comparison).toHaveProperty('vsParisTarget');
+      expect(comparison).toHaveProperty('globalAverage');
+      expect(comparison).toHaveProperty('ukAverage');
+      expect(comparison).toHaveProperty('parisTarget');
+    });
+
+    it('should return numeric comparison percentages', async () => {
+      const res = await request(app).get(`/api/assessments/${testAssessmentId}/compare`);
+      const { comparison } = res.body.data;
+      expect(typeof comparison.vsGlobalAverage).toBe('number');
+      expect(typeof comparison.vsUkAverage).toBe('number');
+      expect(typeof comparison.vsParisTarget).toBe('number');
+    });
+
+    it('should return correct benchmark constants', async () => {
+      const res = await request(app).get(`/api/assessments/${testAssessmentId}/compare`);
+      const { comparison } = res.body.data;
+      expect(comparison.globalAverage).toBe(4700);
+      expect(comparison.ukAverage).toBe(5500);
+      expect(comparison.parisTarget).toBe(2000);
+    });
+
+    it('should return 404 for non-existent assessment', async () => {
+      const res = await request(app).get('/api/assessments/nonexistent-id/compare');
+      expect(res.status).toBe(404);
+    });
+  });
+
+  // ── Permissions-Policy header test ──────────────────────────────────────────
+  describe('Security Headers', () => {
+    it('should include Permissions-Policy header', async () => {
+      const res = await request(app).get('/health');
+      expect(res.headers['permissions-policy']).toBe(
+        'camera=(), microphone=(), geolocation=(), payment=()'
+      );
     });
   });
 });

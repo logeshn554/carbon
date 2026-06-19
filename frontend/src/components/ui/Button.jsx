@@ -1,4 +1,5 @@
 import { forwardRef } from 'react';
+import PropTypes from 'prop-types';
 
 const variants = {
   primary: 'btn-primary',
@@ -13,6 +14,20 @@ const sizes = {
   lg: '!px-8 !py-4 !text-lg',
 };
 
+/**
+ * Button — reusable button component with variant, size, and loading state support.
+ * @param {Object} props
+ * @param {React.ReactNode} props.children - Button content
+ * @param {'primary'|'secondary'|'danger'|'ghost'} [props.variant='primary'] - Visual variant
+ * @param {'sm'|'md'|'lg'} [props.size='md'] - Size variant
+ * @param {string} [props.className=''] - Additional CSS classes
+ * @param {boolean} [props.disabled=false] - Whether the button is disabled
+ * @param {boolean} [props.loading=false] - Whether to show loading spinner
+ * @param {string} [props.type='button'] - HTML button type attribute
+ * @param {Function} [props.onClick] - Click handler
+ * @param {React.Ref} ref - Forwarded ref
+ * @returns {JSX.Element}
+ */
 const Button = forwardRef(function Button(
   {
     children,
@@ -63,5 +78,16 @@ const Button = forwardRef(function Button(
     </button>
   );
 });
+
+Button.propTypes = {
+  children: PropTypes.node.isRequired,
+  variant: PropTypes.oneOf(['primary', 'secondary', 'danger', 'ghost']),
+  size: PropTypes.oneOf(['sm', 'md', 'lg']),
+  className: PropTypes.string,
+  disabled: PropTypes.bool,
+  loading: PropTypes.bool,
+  type: PropTypes.string,
+  onClick: PropTypes.func,
+};
 
 export default Button;

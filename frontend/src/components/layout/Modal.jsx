@@ -1,44 +1,64 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
+import PropTypes from 'prop-types';
 import Icon from '../ui/Icons';
 
+/** @constant {string} FOCUSABLE_SELECTOR - CSS selector for focusable elements */
+const FOCUSABLE_SELECTOR = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+/**
+ * Modal — accessible dialog component with focus trapping, Escape key,
+ * and backdrop click to close. Locks body scroll when open.
+ * @param {Object} props
+ * @param {React.ReactNode} props.children - Modal body content
+ * @param {Function} props.onClose - Callback invoked when modal should close
+ * @param {string} props.title - Dialog title displayed in the header
+ * @returns {JSX.Element}
+ */
 export default function Modal({ children, onClose, title }) {
   const overlayRef = useRef(null);
   const modalRef = useRef(null);
 
+  // Auto-focus first focusable element on mount
   useEffect(() => {
     const autoFocusEl = modalRef.current?.querySelector('[autoFocus]');
     if (autoFocusEl) {
       autoFocusEl.focus();
     } else {
-      const focusable = modalRef.current?.querySelectorAll(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      );
+      const focusable = modalRef.current?.querySelectorAll(FOCUSABLE_SELECTOR);
       focusable?.[0]?.focus();
     }
   }, []);
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') onClose();
-      if (e.key === 'Tab') {
-        const focusable = modalRef.current?.querySelectorAll(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        const first = focusable?.[0];
-        const last = focusable?.[focusable.length - 1];
-        if (e.shiftKey) {
-          if (document.activeElement === first) { e.preventDefault(); last?.focus(); }
-        } else {
-          if (document.activeElement === last) { e.preventDefault(); first?.focus(); }
-        }
+  // Handle Escape key and Tab-based focus trapping
+  const handleKeyDown = useCallback((e) => {
+    if (e.key === 'Escape') onClose();
+    if (e.key === 'Tab') {
+      const focusable = modalRef.current?.querySelectorAll(FOCUSABLE_SELECTOR);
+      const first = focusable?.[0];
+      const last = focusable?.[focusable.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last?.focus(); }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first?.focus(); }
       }
-    };
+    }
+  }, [onClose]);
+
+  useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
     document.body.style.overflow = 'hidden';
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = '';
     };
+  }, [handleKeyDown]);
+
+  /**
+   * Close modal on backdrop click (only if the click target is the overlay itself).
+   * @param {React.MouseEvent} e - The click event
+   */
+  const handleOverlayClick = useCallback((e) => {
+    if (e.target === overlayRef.current) onClose();
   }, [onClose]);
 
   return (
@@ -46,7 +66,7 @@ export default function Modal({ children, onClose, title }) {
       ref={overlayRef}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in"
       style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)' }}
-      onClick={(e) => { if (e.target === overlayRef.current) onClose(); }}
+      onClick={handleOverlayClick}
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
@@ -86,3 +106,9 @@ export default function Modal({ children, onClose, title }) {
     </div>
   );
 }
+
+Modal.propTypes = {
+  children: PropTypes.node.isRequired,
+  onClose: PropTypes.func.isRequired,
+  title: PropTypes.string.isRequired,
+};

@@ -1,14 +1,18 @@
+import PropTypes from 'prop-types';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { CATEGORY_COLORS, CATEGORY_LABELS } from '../../utils/constants';
 import { formatNumber } from '../../utils/formatters';
 
-const COLORS = [
-  CATEGORY_COLORS.transport,
-  CATEGORY_COLORS.energy,
-  CATEGORY_COLORS.food,
-  CATEGORY_COLORS.shopping,
-];
+/** @constant {number} PERCENTAGE_MULTIPLIER - Used in percentage calculations */
+const PERCENTAGE_MULTIPLIER = 100;
 
+/**
+ * Custom tooltip for the emission pie chart.
+ * @param {Object} props
+ * @param {boolean} props.active - Whether the tooltip is active
+ * @param {Array} props.payload - Recharts tooltip payload
+ * @returns {JSX.Element|null}
+ */
 const CustomTooltip = ({ active, payload }) => {
   if (active && payload && payload.length) {
     const d = payload[0].payload;
@@ -27,6 +31,23 @@ const CustomTooltip = ({ active, payload }) => {
   return null;
 };
 
+CustomTooltip.propTypes = {
+  active: PropTypes.bool,
+  payload: PropTypes.arrayOf(PropTypes.shape({
+    payload: PropTypes.shape({
+      name: PropTypes.string,
+      value: PropTypes.number,
+      percent: PropTypes.number,
+    }),
+  })),
+};
+
+/**
+ * Custom legend for the pie chart.
+ * @param {Object} props
+ * @param {Array} props.payload - Recharts legend payload
+ * @returns {JSX.Element}
+ */
 const CustomLegend = ({ payload }) => (
   <ul className="flex flex-wrap justify-center gap-3 mt-2" role="list">
     {payload?.map((entry) => (
@@ -42,6 +63,20 @@ const CustomLegend = ({ payload }) => (
   </ul>
 );
 
+CustomLegend.propTypes = {
+  payload: PropTypes.arrayOf(PropTypes.shape({
+    value: PropTypes.string,
+    color: PropTypes.string,
+  })),
+};
+
+/**
+ * EmissionPieChart — renders a donut chart of emission categories
+ * with an accessible hidden data table for screen readers.
+ * @param {Object} props
+ * @param {Object} props.assessment - The full assessment record
+ * @returns {JSX.Element}
+ */
 export default function EmissionPieChart({ assessment }) {
   const data = [
     { name: CATEGORY_LABELS.transport, value: assessment.transportEmission, key: 'transport' },
@@ -50,7 +85,7 @@ export default function EmissionPieChart({ assessment }) {
     { name: CATEGORY_LABELS.shopping, value: assessment.shoppingEmission, key: 'shopping' },
   ]
     .filter((d) => d.value > 0)
-    .map((d) => ({ ...d, percent: (d.value / assessment.totalEmission) * 100 }));
+    .map((d) => ({ ...d, percent: (d.value / assessment.totalEmission) * PERCENTAGE_MULTIPLIER }));
 
   return (
     <div className="glass-card p-6">
@@ -94,6 +129,37 @@ export default function EmissionPieChart({ assessment }) {
           </PieChart>
         </ResponsiveContainer>
       </div>
+
+      {/* Accessible data table fallback for screen readers */}
+      <table className="sr-only" aria-label="Emission breakdown data">
+        <caption>Emission Sources Breakdown</caption>
+        <thead>
+          <tr>
+            <th scope="col">Category</th>
+            <th scope="col">Emissions (kg CO₂)</th>
+            <th scope="col">Percentage</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((d) => (
+            <tr key={d.key}>
+              <td>{d.name}</td>
+              <td>{formatNumber(d.value)}</td>
+              <td>{d.percent.toFixed(1)}%</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
+
+EmissionPieChart.propTypes = {
+  assessment: PropTypes.shape({
+    totalEmission: PropTypes.number.isRequired,
+    transportEmission: PropTypes.number.isRequired,
+    energyEmission: PropTypes.number.isRequired,
+    foodEmission: PropTypes.number.isRequired,
+    shoppingEmission: PropTypes.number.isRequired,
+  }).isRequired,
+};

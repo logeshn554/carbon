@@ -6,6 +6,12 @@ import { PageLoader } from '../components/ui/LoadingSpinner';
 import Button from '../components/ui/Button';
 import { formatDate, formatRelativeTime, getScoreInfo, formatNumber } from '../utils/formatters';
 
+/** @constant {number} TONNES_DIVISOR - Converts kg to tonnes */
+const TONNES_DIVISOR = 1000;
+
+/** @constant {number} ANIMATION_DELAY_STEP - Seconds between staggered card animations */
+const ANIMATION_DELAY_STEP = 0.04;
+
 const CATEGORY_LABELS = {
   transport: 'Transport',
   energy: 'Energy',
@@ -21,8 +27,7 @@ export default function HistoryPage() {
     if (user?.id && user?.isRegistered) {
       fetchAssessments();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, user?.isRegistered]);
+  }, [user?.id, user?.isRegistered, fetchAssessments]);
 
   if (loading) return <PageLoader />;
 
@@ -117,7 +122,7 @@ export default function HistoryPage() {
                 <article
                   key={a.id}
                   className="glass-card-hover p-5 animate-slide-up"
-                  style={{ animationDelay: `${i * 0.04}s` }}
+                  style={{ animationDelay: `${i * ANIMATION_DELAY_STEP}s` }}
                   aria-label={`Assessment from ${formatDate(a.createdAt)}, score ${a.sustainabilityScore}`}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -149,7 +154,7 @@ export default function HistoryPage() {
                           )}
                         </div>
                         <p className="text-sm" style={{ color: '#555' }}>
-                          {formatRelativeTime(a.createdAt)} · {(a.totalEmission / 1000).toFixed(2)} tonnes CO₂/year
+                          {formatRelativeTime(a.createdAt)} · {(a.totalEmission / TONNES_DIVISOR).toFixed(2)} tonnes CO₂/year
                         </p>
                         {/* Category breakdown */}
                         <div className="flex items-center gap-4 mt-2">
@@ -169,10 +174,16 @@ export default function HistoryPage() {
                     </div>
 
                     <div className="flex gap-2">
-                      <Link to={`/simulator/${a.id}`}>
+                      <Link
+                        to={`/simulator/${a.id}`}
+                        aria-label={`Simulate changes for assessment from ${formatDate(a.createdAt)}, score ${a.sustainabilityScore}`}
+                      >
                         <Button variant="secondary" size="sm">Simulate</Button>
                       </Link>
-                      <Link to={`/dashboard/${a.id}`}>
+                      <Link
+                        to={`/dashboard/${a.id}`}
+                        aria-label={`View assessment from ${formatDate(a.createdAt)}, score ${a.sustainabilityScore}`}
+                      >
                         <Button size="sm">View</Button>
                       </Link>
                     </div>

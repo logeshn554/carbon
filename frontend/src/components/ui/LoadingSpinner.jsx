@@ -1,3 +1,14 @@
+import PropTypes from 'prop-types';
+
+/**
+ * LoadingSpinner — accessible loading indicator with configurable size.
+ * Container includes aria-live="polite" and aria-busy="true" for assistive technologies.
+ * @param {Object} props
+ * @param {'sm'|'md'|'lg'|'xl'} [props.size='md'] - Spinner size variant
+ * @param {string} [props.className=''] - Additional CSS classes
+ * @param {string} [props.label='Loading...'] - Accessible label for screen readers
+ * @returns {JSX.Element}
+ */
 export default function LoadingSpinner({ size = 'md', className = '', label = 'Loading...' }) {
   const sizes = {
     sm: 'h-4 w-4 border-2',
@@ -7,7 +18,13 @@ export default function LoadingSpinner({ size = 'md', className = '', label = 'L
   };
 
   return (
-    <div role="status" aria-label={label} className={`flex items-center justify-center ${className}`}>
+    <div
+      role="status"
+      aria-label={label}
+      aria-live="polite"
+      aria-busy="true"
+      className={`flex items-center justify-center ${className}`}
+    >
       <div
         className={`${sizes[size]} rounded-full animate-spin`}
         style={{
@@ -20,9 +37,23 @@ export default function LoadingSpinner({ size = 'md', className = '', label = 'L
   );
 }
 
+LoadingSpinner.propTypes = {
+  size: PropTypes.oneOf(['sm', 'md', 'lg', 'xl']),
+  className: PropTypes.string,
+  label: PropTypes.string,
+};
+
+/**
+ * PageLoader — full-page loading state with centered spinner and text.
+ * @returns {JSX.Element}
+ */
 export function PageLoader() {
   return (
-    <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
+    <div
+      className="min-h-[60vh] flex flex-col items-center justify-center gap-4"
+      aria-live="polite"
+      aria-busy="true"
+    >
       <LoadingSpinner size="xl" />
       <p className="text-slate-400 animate-pulse">Loading...</p>
     </div>

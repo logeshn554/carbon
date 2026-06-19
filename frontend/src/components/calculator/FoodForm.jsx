@@ -1,4 +1,5 @@
 import { memo, useCallback } from 'react';
+import PropTypes from 'prop-types';
 import Icon from '../ui/Icons';
 
 const dietOptions = [
@@ -44,11 +45,19 @@ const dietOptions = [
   },
 ];
 
+/** @constant {number} MAX_EMISSION - Highest diet emission value for bar chart scaling */
 const MAX_EMISSION = 3300;
+
+/** @constant {number} PERCENTAGE_MULTIPLIER - Multiplier for bar percentage calculation */
+const PERCENTAGE_MULTIPLIER = 100;
 
 /**
  * FoodForm — step 3 of the carbon calculator.
  * Collects diet type via accessible radio button group.
+ * @param {Object} props
+ * @param {Object} props.data - Form field values for food (includes dietType)
+ * @param {Function} props.onChange - Callback invoked with updated data object
+ * @returns {JSX.Element}
  */
 function FoodForm({ data, onChange }) {
   const handleDietChange = useCallback(
@@ -138,7 +147,7 @@ function FoodForm({ data, onChange }) {
             Annual CO₂ Comparison
           </p>
           {dietOptions.map((option) => {
-            const percentage = (option.emissionNum / MAX_EMISSION) * 100;
+            const percentage = (option.emissionNum / MAX_EMISSION) * PERCENTAGE_MULTIPLIER;
             const isSelected = data.dietType === option.value;
             return (
               <div key={option.value} className="flex items-center gap-3 mb-2">
@@ -166,5 +175,12 @@ function FoodForm({ data, onChange }) {
     </fieldset>
   );
 }
+
+FoodForm.propTypes = {
+  data: PropTypes.shape({
+    dietType: PropTypes.string,
+  }).isRequired,
+  onChange: PropTypes.func.isRequired,
+};
 
 export default memo(FoodForm);

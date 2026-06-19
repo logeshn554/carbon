@@ -1,8 +1,24 @@
+import PropTypes from 'prop-types';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine
 } from 'recharts';
 import { formatDateShort, formatNumber } from '../../utils/formatters';
+import { GLOBAL_AVERAGE_EMISSION, TARGET_EMISSION } from '../../utils/constants';
 
+/** @constant {number} TONNES_DIVISOR - Converts kg to tonnes for axis labels */
+const TONNES_DIVISOR = 1000;
+
+/** @constant {number} MIN_ASSESSMENTS_FOR_CHART - Minimum assessments needed to show chart */
+const MIN_ASSESSMENTS_FOR_CHART = 2;
+
+/**
+ * Custom tooltip for the trend line chart.
+ * @param {Object} props
+ * @param {boolean} props.active - Whether the tooltip is active
+ * @param {Array} props.payload - Recharts tooltip payload
+ * @param {string} props.label - X-axis label
+ * @returns {JSX.Element|null}
+ */
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
@@ -19,6 +35,19 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
+CustomTooltip.propTypes = {
+  active: PropTypes.bool,
+  payload: PropTypes.array,
+  label: PropTypes.string,
+};
+
+/**
+ * TrendChart — renders a line chart showing the user's carbon footprint
+ * over multiple assessments, with reference lines for global avg and Paris target.
+ * @param {Object} props
+ * @param {Object[]} props.assessments - Array of assessment records
+ * @returns {JSX.Element|null}
+ */
 export default function TrendChart({ assessments }) {
   if (!assessments?.length) return null;
 
@@ -31,9 +60,6 @@ export default function TrendChart({ assessments }) {
       energy: a.energyEmission,
       food: a.foodEmission,
     }));
-
-  const globalAvg = 4700;
-  const parisTarget = 2000;
 
   return (
     <div className="glass-card p-6">
@@ -53,7 +79,7 @@ export default function TrendChart({ assessments }) {
         </div>
       </div>
 
-      {assessments.length < 2 ? (
+      {assessments.length < MIN_ASSESSMENTS_FOR_CHART ? (
         <div className="flex items-center justify-center h-48 text-center">
           <div>
             <p className="text-slate-400 text-sm mb-1">📈 Trend chart will appear here</p>
@@ -80,18 +106,18 @@ export default function TrendChart({ assessments }) {
                 tick={{ fill: '#64748b', fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
-                tickFormatter={(v) => `${(v/1000).toFixed(1)}t`}
+                tickFormatter={(v) => `${(v / TONNES_DIVISOR).toFixed(1)}t`}
               />
               <Tooltip content={<CustomTooltip />} />
               <ReferenceLine
-                y={globalAvg}
+                y={GLOBAL_AVERAGE_EMISSION}
                 stroke="#f59e0b"
                 strokeDasharray="5 5"
                 strokeOpacity={0.5}
                 label={{ value: 'Global Avg', fill: '#f59e0b', fontSize: 10, position: 'right' }}
               />
               <ReferenceLine
-                y={parisTarget}
+                y={TARGET_EMISSION}
                 stroke="#10b981"
                 strokeDasharray="5 5"
                 strokeOpacity={0.5}
@@ -113,3 +139,16 @@ export default function TrendChart({ assessments }) {
     </div>
   );
 }
+
+TrendChart.propTypes = {
+  assessments: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string,
+      createdAt: PropTypes.string.isRequired,
+      totalEmission: PropTypes.number.isRequired,
+      transportEmission: PropTypes.number,
+      energyEmission: PropTypes.number,
+      foodEmission: PropTypes.number,
+    })
+  ),
+};

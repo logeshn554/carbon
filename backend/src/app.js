@@ -44,6 +44,16 @@ app.use(
   })
 );
 
+// ── Permissions-Policy Header ───────────────────────────────────────────────
+// Restrict access to sensitive browser APIs that this application does not use.
+app.use((req, res, next) => {
+  res.setHeader(
+    'Permissions-Policy',
+    'camera=(), microphone=(), geolocation=(), payment=()'
+  );
+  next();
+});
+
 // ── CORS ─────────────────────────────────────────────────────────────────────
 const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
 const corsOrigins = corsOrigin.split(',').map((o) => o.trim()).filter(Boolean);

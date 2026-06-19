@@ -1,8 +1,15 @@
 import { memo, useCallback, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import Input from '../ui/Input';
 import Icon from '../ui/Icons';
 import { sanitizeNumber, sanitizeInteger } from '../../utils/sanitize';
 import { ELECTRICITY_GRID_FACTOR, INPUT_LIMITS } from '../../utils/constants';
+
+/** @constant {number} MONTHS_PER_YEAR - Months in a year for annualisation */
+const MONTHS_PER_YEAR = 12;
+
+/** @constant {number} MAX_RENEWABLE_PERCENT - Maximum renewable percentage */
+const MAX_RENEWABLE_PERCENT = 100;
 
 const energyFacts = [
   { icon: 'plug', label: 'Grid Average', value: '0.233 kg CO₂/kWh', color: '#F59E0B' },
@@ -13,6 +20,10 @@ const energyFacts = [
 /**
  * EnergyForm — step 2 of the carbon calculator.
  * Collects monthly electricity usage and renewable energy percentage.
+ * @param {Object} props
+ * @param {Object} props.data - Form field values for energy
+ * @param {Function} props.onChange - Callback invoked with updated data object
+ * @returns {JSX.Element}
  */
 function EnergyForm({ data, onChange }) {
   const handleChange = useCallback(
@@ -23,16 +34,16 @@ function EnergyForm({ data, onChange }) {
   // Memoized emission preview using ELECTRICITY_GRID_FACTOR constant
   const nonRenewableEmission = useMemo(() => {
     if (!data.monthlyElectricityKwh) return 0;
-    const renewable = sanitizeInteger(data.renewablePercentage || 0, 0, 100);
+    const renewable = sanitizeInteger(data.renewablePercentage || 0, 0, MAX_RENEWABLE_PERCENT);
     return Math.round(
-      data.monthlyElectricityKwh * 12 * ELECTRICITY_GRID_FACTOR * (1 - renewable / 100)
+      data.monthlyElectricityKwh * MONTHS_PER_YEAR * ELECTRICITY_GRID_FACTOR * (1 - renewable / MAX_RENEWABLE_PERCENT)
     );
   }, [data.monthlyElectricityKwh, data.renewablePercentage]);
 
   const renewableSavings = useMemo(() => {
     if (!data.monthlyElectricityKwh || !data.renewablePercentage) return 0;
-    const renewable = sanitizeInteger(data.renewablePercentage, 0, 100);
-    return Math.round(data.monthlyElectricityKwh * 12 * ELECTRICITY_GRID_FACTOR * (renewable / 100));
+    const renewable = sanitizeInteger(data.renewablePercentage, 0, MAX_RENEWABLE_PERCENT);
+    return Math.round(data.monthlyElectricityKwh * MONTHS_PER_YEAR * ELECTRICITY_GRID_FACTOR * (renewable / MAX_RENEWABLE_PERCENT));
   }, [data.monthlyElectricityKwh, data.renewablePercentage]);
 
   return (
@@ -67,7 +78,7 @@ function EnergyForm({ data, onChange }) {
                 sanitizeInteger(e.target.value, INPUT_LIMITS.renewablePercentage.min, INPUT_LIMITS.renewablePercentage.max))}
               className="w-full mt-2"
               aria-valuemin={0}
-              aria-valuemax={100}
+              aria-valuemax={MAX_RENEWABLE_PERCENT}
               aria-valuenow={data.renewablePercentage || 0}
               aria-label="Renewable energy percentage"
             />
@@ -128,5 +139,13 @@ function EnergyForm({ data, onChange }) {
     </fieldset>
   );
 }
+
+EnergyForm.propTypes = {
+  data: PropTypes.shape({
+    monthlyElectricityKwh: PropTypes.number,
+    renewablePercentage: PropTypes.number,
+  }).isRequired,
+  onChange: PropTypes.func.isRequired,
+};
 
 export default memo(EnergyForm);

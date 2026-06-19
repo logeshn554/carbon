@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { formatNumber, getPriorityInfo } from '../../utils/formatters';
 import Icon from '../ui/Icons';
 
@@ -8,6 +9,17 @@ const CATEGORY_ICON_MAP = {
   shopping: 'shopping',
 };
 
+/** @constant {number} ANIMATION_DELAY_STEP - Seconds between staggered card animations */
+const ANIMATION_DELAY_STEP = 0.06;
+
+/**
+ * RecommendationCard — displays a single AI-generated reduction recommendation
+ * with priority badge, category icon, and estimated CO₂ savings.
+ * @param {Object} props
+ * @param {Object} props.recommendation - The recommendation record
+ * @param {number} props.index - Position index for stagger animation delay
+ * @returns {JSX.Element}
+ */
 export default function RecommendationCard({ recommendation, index }) {
   const priorityInfo = getPriorityInfo(recommendation.priority);
   const iconName = CATEGORY_ICON_MAP[recommendation.category] || 'info';
@@ -27,7 +39,7 @@ export default function RecommendationCard({ recommendation, index }) {
   return (
     <div
       className="glass-card-hover p-5 animate-slide-up"
-      style={{ animationDelay: `${index * 0.06}s` }}
+      style={{ animationDelay: `${index * ANIMATION_DELAY_STEP}s` }}
     >
       <div className="flex items-start gap-4">
         {/* Category icon */}
@@ -72,3 +84,15 @@ export default function RecommendationCard({ recommendation, index }) {
     </div>
   );
 }
+
+RecommendationCard.propTypes = {
+  recommendation: PropTypes.shape({
+    id: PropTypes.string,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    estimatedSavings: PropTypes.number.isRequired,
+    priority: PropTypes.oneOf(['HIGH', 'MEDIUM', 'LOW']).isRequired,
+    category: PropTypes.string.isRequired,
+  }).isRequired,
+  index: PropTypes.number.isRequired,
+};

@@ -490,3 +490,10 @@ input[type=range]::-webkit-slider-thumb:hover {
     linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
   background-size: 48px 48px;
 }
+
+/* ── Progress fill (moved from inline dangerouslySetInnerHTML) ── */
+@keyframes progressFill {
+  from { width: 0%; }
+  to { width: 98%; }
+}
+

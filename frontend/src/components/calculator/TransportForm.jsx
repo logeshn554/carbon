@@ -1,9 +1,13 @@
 import { memo, useCallback, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import Input from '../ui/Input';
 import Select from '../ui/Select';
 import Icon from '../ui/Icons';
 import { sanitizeNumber, sanitizeInteger } from '../../utils/sanitize';
 import { CAR_EMISSION_FACTORS, FLIGHT_FACTORS, INPUT_LIMITS } from '../../utils/constants';
+
+/** @constant {number} DAYS_PER_YEAR - Number of days in a year for annualisation */
+const DAYS_PER_YEAR = 365;
 
 const fuelTypeOptions = [
   { value: 'none', label: "I don't drive / No car" },
@@ -16,6 +20,10 @@ const fuelTypeOptions = [
 /**
  * TransportForm — step 1 of the carbon calculator.
  * Collects car usage, public transport, cycling, and flight data.
+ * @param {Object} props
+ * @param {Object} props.data - Form field values for transport
+ * @param {Function} props.onChange - Callback invoked with updated data object
+ * @returns {JSX.Element}
  */
 function TransportForm({ data, onChange }) {
   const handleChange = useCallback(
@@ -27,7 +35,7 @@ function TransportForm({ data, onChange }) {
   const preview = useMemo(() => {
     const carFactor = CAR_EMISSION_FACTORS[data.carFuelType] ?? 0;
     return {
-      car: data.dailyCarKm > 0 ? Math.round(data.dailyCarKm * carFactor * 365) : 0,
+      car: data.dailyCarKm > 0 ? Math.round(data.dailyCarKm * carFactor * DAYS_PER_YEAR) : 0,
       shortFlights: data.shortFlightsPerYear > 0
         ? data.shortFlightsPerYear * FLIGHT_FACTORS.short_haul : 0,
       longFlights: data.longFlightsPerYear > 0
@@ -146,5 +154,17 @@ function TransportForm({ data, onChange }) {
     </fieldset>
   );
 }
+
+TransportForm.propTypes = {
+  data: PropTypes.shape({
+    carFuelType: PropTypes.string,
+    dailyCarKm: PropTypes.number,
+    publicTransportKmPerWeek: PropTypes.number,
+    cyclingKmPerWeek: PropTypes.number,
+    shortFlightsPerYear: PropTypes.number,
+    longFlightsPerYear: PropTypes.number,
+  }).isRequired,
+  onChange: PropTypes.func.isRequired,
+};
 
 export default memo(TransportForm);

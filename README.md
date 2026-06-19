@@ -21,6 +21,20 @@
 
 ---
 
+## Scientific Basis
+
+EcoGuide AI uses peer-reviewed emission factors to ensure accuracy:
+
+| Source | Application |
+|---|---|
+| **IPCC AR6 (2022)** | Global Warming Potentials and transport/energy emission factors |
+| **EPA GHG Equivalencies (2023)** | US-specific conversion factors for electricity, diet, and consumer goods |
+| **DEFRA (2023)** | UK grid electricity carbon intensity (0.233 kg CO₂/kWh) |
+
+All calculation logic is in [`carbonCalculator.js`](./backend/src/services/carbonCalculator.js) with inline citations for each factor.
+
+---
+
 ## Architecture
 
 ```
@@ -132,6 +146,45 @@ Test suites include:
 - **Sanitize utility** — HTML stripping, range clamping, NaN handling
 - **Debounce utility** — timing, coalescing, argument passing
 - **Calculation Cache** — hit/miss, key stability, eviction
+- **Compare endpoint** — benchmark comparison against global/UK/Paris averages
+- **Unknown-key guard** — rejects unexpected fields in assessment creation
+
+---
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/api/assessments` | Create a new carbon footprint assessment |
+| `GET` | `/api/assessments/:id` | Retrieve a specific assessment by ID |
+| `GET` | `/api/assessments/user/:userId` | Get all assessments for a user |
+| `GET` | `/api/assessments/:id/compare` | Compare footprint against benchmarks |
+| `POST` | `/api/users` | Create or find a user |
+| `POST` | `/api/simulations` | Run a what-if simulation |
+
+### `GET /api/assessments/:id/compare`
+
+Returns how a specific assessment compares to global, UK, and Paris Agreement benchmarks.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "assessmentId": "uuid",
+    "totalEmission": 4200,
+    "sustainabilityScore": 78,
+    "comparison": {
+      "vsGlobalAverage": -10.6,
+      "vsUkAverage": -23.6,
+      "vsParisTarget": 110.0,
+      "globalAverage": 4700,
+      "ukAverage": 5500,
+      "parisTarget": 2000
+    }
+  }
+}
+```
 
 ---
 

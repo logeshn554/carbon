@@ -1,4 +1,5 @@
 import { memo, useCallback, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import Input from '../ui/Input';
 import Icon from '../ui/Icons';
 import { sanitizeInteger } from '../../utils/sanitize';
@@ -13,6 +14,10 @@ const tips = [
 /**
  * ShoppingForm — step 4 of the carbon calculator.
  * Collects clothing and electronics purchasing data.
+ * @param {Object} props
+ * @param {Object} props.data - Form field values for shopping
+ * @param {Function} props.onChange - Callback invoked with updated data object
+ * @returns {JSX.Element}
  */
 function ShoppingForm({ data, onChange }) {
   const handleChange = useCallback(
@@ -126,5 +131,13 @@ function ShoppingForm({ data, onChange }) {
     </fieldset>
   );
 }
+
+ShoppingForm.propTypes = {
+  data: PropTypes.shape({
+    clothingItemsPerYear: PropTypes.number,
+    electronicsItemsPerYear: PropTypes.number,
+  }).isRequired,
+  onChange: PropTypes.func.isRequired,
+};
 
 export default memo(ShoppingForm);

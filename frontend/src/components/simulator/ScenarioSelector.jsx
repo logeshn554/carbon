@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { SIMULATION_SCENARIOS, CATEGORY_COLORS } from '../../utils/constants';
 import Button from '../ui/Button';
 
@@ -8,6 +9,16 @@ const categoryColors = {
   shopping: 'border-orange-500/40 bg-orange-500/8',
 };
 
+/**
+ * ScenarioSelector — renders categorised simulation scenarios as
+ * selectable cards with an aria-pressed toggle pattern.
+ * @param {Object} props
+ * @param {Object|null} props.selectedScenario - Currently selected scenario or null
+ * @param {Function} props.onSelect - Callback when a scenario is clicked
+ * @param {Function} props.onRun - Callback to run the selected simulation
+ * @param {boolean} props.loading - Whether a simulation is currently running
+ * @returns {JSX.Element}
+ */
 export default function ScenarioSelector({ selectedScenario, onSelect, onRun, loading }) {
   const categories = [...new Set(SIMULATION_SCENARIOS.map((s) => s.category))];
 
@@ -18,15 +29,21 @@ export default function ScenarioSelector({ selectedScenario, onSelect, onRun, lo
           <h3 className="text-sm uppercase tracking-wider text-slate-500 font-medium mb-3 capitalize">
             {category}
           </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div
+            className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+            role="radiogroup"
+            aria-label={`${category} scenarios`}
+          >
             {SIMULATION_SCENARIOS.filter((s) => s.category === category).map((scenario) => {
               const isSelected = selectedScenario?.id === scenario.id;
               return (
                 <button
                   key={scenario.id}
                   type="button"
+                  role="radio"
+                  aria-checked={isSelected}
+                  aria-describedby={`scenario-desc-${scenario.id}`}
                   onClick={() => onSelect(scenario)}
-                  aria-pressed={isSelected}
                   className={`
                     text-left p-4 rounded-xl border transition-all duration-200
                     ${isSelected
@@ -40,7 +57,9 @@ export default function ScenarioSelector({ selectedScenario, onSelect, onRun, lo
                       <p className={`font-semibold text-sm ${isSelected ? 'text-slate-100' : 'text-slate-300'}`}>
                         {scenario.name}
                       </p>
-                      <p className="text-xs text-slate-500 mt-0.5">{scenario.description}</p>
+                      <p id={`scenario-desc-${scenario.id}`} className="text-xs text-slate-500 mt-0.5">
+                        {scenario.description}
+                      </p>
                     </div>
                     {isSelected && (
                       <div
@@ -72,3 +91,17 @@ export default function ScenarioSelector({ selectedScenario, onSelect, onRun, lo
     </div>
   );
 }
+
+ScenarioSelector.propTypes = {
+  selectedScenario: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    name: PropTypes.string,
+    description: PropTypes.string,
+    icon: PropTypes.string,
+    category: PropTypes.string,
+    params: PropTypes.object,
+  }),
+  onSelect: PropTypes.func.isRequired,
+  onRun: PropTypes.func.isRequired,
+  loading: PropTypes.bool.isRequired,
+};

@@ -1,13 +1,25 @@
+import PropTypes from 'prop-types';
 import { getScoreInfo } from '../../utils/formatters';
 
+/** @constant {number} GAUGE_RADIUS - Radius of the SVG gauge arc in px */
+const GAUGE_RADIUS = 80;
+
+/** @constant {number} MAX_SCORE - Maximum possible sustainability score */
+const MAX_SCORE = 100;
+
+/**
+ * ScoreGauge — renders a half-circle SVG gauge to visualize the
+ * sustainability score from 0 to 100 with animated arc and tick marks.
+ * @param {Object} props
+ * @param {number} props.score - Sustainability score (0-100)
+ * @returns {JSX.Element}
+ */
 export default function ScoreGauge({ score }) {
   const info = getScoreInfo(score);
 
   // Calculate the arc position for SVG gauge
-  const radius = 80;
-  const circumference = Math.PI * radius; // Half circle
-  const progress = (score / 100) * circumference;
-  const offset = circumference - progress;
+  const circumference = Math.PI * GAUGE_RADIUS; // Half circle
+  const progress = (score / MAX_SCORE) * circumference;
 
   return (
     <div className="glass-card p-6 flex flex-col items-center animate-slide-up">
@@ -40,11 +52,11 @@ export default function ScoreGauge({ score }) {
           />
           {/* Tick marks */}
           {[0, 25, 50, 75, 100].map((pct) => {
-            const angle = (pct / 100) * Math.PI;
-            const x1 = 100 - Math.cos(angle) * 76;
-            const y1 = 100 - Math.sin(angle) * 76;
-            const x2 = 100 - Math.cos(angle) * 88;
-            const y2 = 100 - Math.sin(angle) * 88;
+            const angle = (pct / MAX_SCORE) * Math.PI;
+            const x1 = MAX_SCORE - Math.cos(angle) * 76;
+            const y1 = MAX_SCORE - Math.sin(angle) * 76;
+            const x2 = MAX_SCORE - Math.cos(angle) * 88;
+            const y2 = MAX_SCORE - Math.sin(angle) * 88;
             return (
               <line
                 key={pct}
@@ -88,3 +100,7 @@ export default function ScoreGauge({ score }) {
     </div>
   );
 }
+
+ScoreGauge.propTypes = {
+  score: PropTypes.number.isRequired,
+};

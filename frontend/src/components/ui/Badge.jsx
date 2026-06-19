@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 const variants = {
   eco: 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-400',
   high: 'badge-high',
@@ -8,6 +10,15 @@ const variants = {
   slate: 'bg-slate-500/15 border border-slate-500/30 text-slate-400',
 };
 
+/**
+ * Badge — small status label with color variants and optional dot indicator.
+ * @param {Object} props
+ * @param {React.ReactNode} props.children - Badge text content
+ * @param {'eco'|'high'|'medium'|'low'|'cyan'|'purple'|'slate'} [props.variant='eco'] - Color variant
+ * @param {string} [props.className=''] - Additional CSS classes
+ * @param {boolean} [props.dot=false] - Show dot indicator
+ * @returns {JSX.Element}
+ */
 export default function Badge({ children, variant = 'eco', className = '', dot = false }) {
   return (
     <span
@@ -27,3 +38,10 @@ export default function Badge({ children, variant = 'eco', className = '', dot =
     </span>
   );
 }
+
+Badge.propTypes = {
+  children: PropTypes.node.isRequired,
+  variant: PropTypes.oneOf(['eco', 'high', 'medium', 'low', 'cyan', 'purple', 'slate']),
+  className: PropTypes.string,
+  dot: PropTypes.bool,
+};

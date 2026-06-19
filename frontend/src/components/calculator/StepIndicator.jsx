@@ -1,8 +1,13 @@
 import { memo } from 'react';
+import PropTypes from 'prop-types';
 
 /**
  * StepIndicator — displays progress through the calculator steps.
  * Wrapped in React.memo to prevent re-renders when parent re-renders for unrelated reasons.
+ * @param {Object} props
+ * @param {{ id: string, label: string, sublabel: string }[]} props.steps - Array of step definitions
+ * @param {number} props.currentStep - Zero-based index of the active step
+ * @returns {JSX.Element}
  */
 function StepIndicator({ steps, currentStep }) {
   return (
@@ -80,5 +85,16 @@ function StepIndicator({ steps, currentStep }) {
     </nav>
   );
 }
+
+StepIndicator.propTypes = {
+  steps: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
+      sublabel: PropTypes.string,
+    })
+  ).isRequired,
+  currentStep: PropTypes.number.isRequired,
+};
 
 export default memo(StepIndicator);

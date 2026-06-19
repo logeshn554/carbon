@@ -1,5 +1,18 @@
 import { forwardRef } from 'react';
+import PropTypes from 'prop-types';
 
+/**
+ * Input — accessible form input with label, hint text, and error display.
+ * @param {Object} props
+ * @param {string} [props.label] - Label text displayed above the input
+ * @param {string} [props.id] - HTML id attribute (also used for label association)
+ * @param {string} [props.error] - Error message to display below the input
+ * @param {string} [props.hint] - Helper hint text displayed when no error
+ * @param {string} [props.className=''] - Additional CSS classes
+ * @param {boolean} [props.required=false] - Whether the field is required
+ * @param {React.Ref} ref - Forwarded ref
+ * @returns {JSX.Element}
+ */
 const Input = forwardRef(function Input(
   { label, id, error, hint, className = '', required = false, ...props },
   ref
@@ -34,5 +47,14 @@ const Input = forwardRef(function Input(
     </div>
   );
 });
+
+Input.propTypes = {
+  label: PropTypes.string,
+  id: PropTypes.string,
+  error: PropTypes.string,
+  hint: PropTypes.string,
+  className: PropTypes.string,
+  required: PropTypes.bool,
+};
 
 export default Input;

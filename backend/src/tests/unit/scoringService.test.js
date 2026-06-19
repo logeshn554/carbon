@@ -110,6 +110,62 @@ describe('Scoring Service', () => {
       const result = compareToAverages(8000);
       expect(result.vsGlobalAverage).toBeGreaterThan(0);
     });
+
+    it('returns correct global average constant', () => {
+      const result = compareToAverages(4700);
+      expect(result.globalAverage).toBe(4700);
+    });
+
+    it('returns correct UK average constant', () => {
+      const result = compareToAverages(5500);
+      expect(result.ukAverage).toBe(5500);
+    });
+
+    it('returns correct Paris target constant', () => {
+      const result = compareToAverages(2000);
+      expect(result.parisTarget).toBe(2000);
+    });
+
+    it('calculates vsUkAverage correctly for 0 emissions', () => {
+      const result = compareToAverages(0);
+      expect(result.vsUkAverage).toBe(-100);
+    });
+
+    it('calculates vsParisTarget correctly for zero emissions', () => {
+      const result = compareToAverages(0);
+      expect(result.vsParisTarget).toBe(-100);
+    });
+
+    it('calculates vsGlobalAverage correctly for double global average', () => {
+      const result = compareToAverages(9400);
+      expect(result.vsGlobalAverage).toBeCloseTo(100, 0);
+    });
+
+    it('calculates vsUkAverage correctly for UK average emission', () => {
+      const result = compareToAverages(5500);
+      expect(result.vsUkAverage).toBeCloseTo(0, 0);
+    });
+
+    it('calculates vsParisTarget correctly for Paris target emission', () => {
+      const result = compareToAverages(2000);
+      expect(result.vsParisTarget).toBeCloseTo(0, 0);
+    });
+
+    it('handles very large emissions correctly', () => {
+      const result = compareToAverages(50000);
+      expect(result.vsGlobalAverage).toBeGreaterThan(900);
+      expect(result.vsUkAverage).toBeGreaterThan(800);
+    });
+
+    it('returns numeric types for all comparison fields', () => {
+      const result = compareToAverages(3000);
+      expect(typeof result.vsGlobalAverage).toBe('number');
+      expect(typeof result.vsUkAverage).toBe('number');
+      expect(typeof result.vsParisTarget).toBe('number');
+      expect(typeof result.globalAverage).toBe('number');
+      expect(typeof result.ukAverage).toBe('number');
+      expect(typeof result.parisTarget).toBe('number');
+    });
   });
 
   // ── Boundary Tests ────────────────────────────────────────────────────────────

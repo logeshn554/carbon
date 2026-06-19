@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAssessment } from '../hooks/useAssessment';
 import { useSimulation } from '../hooks/useSimulation';
@@ -6,10 +6,17 @@ import ScenarioSelector from '../components/simulator/ScenarioSelector';
 import ImpactDisplay from '../components/simulator/ImpactDisplay';
 import ComparisonBar from '../components/simulator/ComparisonBar';
 import { PageLoader } from '../components/ui/LoadingSpinner';
+import LoadingSpinner from '../components/ui/LoadingSpinner';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import { formatEmissionTonnes } from '../utils/formatters';
 import Icon from '../components/ui/Icons';
+
+/** @constant {number} TONNES_DIVISOR - Converts kg to tonnes */
+const TONNES_DIVISOR = 1000;
+
+/** @constant {number} MAX_HISTORY_ITEMS - Maximum simulation history entries to keep */
+const MAX_HISTORY_ITEMS = 4;
 
 export default function SimulatorPage() {
   const { assessmentId } = useParams();
@@ -20,10 +27,9 @@ export default function SimulatorPage() {
 
   useEffect(() => {
     if (assessmentId) fetchAssessment(assessmentId);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [assessmentId]);
+  }, [assessmentId, fetchAssessment]);
 
-  const handleRun = async () => {
+  const handleRun = useCallback(async () => {
     if (!selectedScenario || !assessmentId) return;
     try {
       const result = await runSimulation(
@@ -31,21 +37,29 @@ export default function SimulatorPage() {
         selectedScenario.name,
         selectedScenario.params
       );
-      setHistory((prev) => [result, ...prev.slice(0, 4)]);
+      setHistory((prev) => [result, ...prev.slice(0, MAX_HISTORY_ITEMS)]);
     } catch (err) {
-      console.error('Simulation error:', err);
+      // Error is already surfaced via simError state from useSimulation
     }
-  };
+  }, [selectedScenario, assessmentId, runSimulation]);
 
-  if (loading) return <PageLoader />;
-  if (!assessment) return null;
-
-  const categoryRows = [
+  const categoryRows = useMemo(() => [
     { key: 'transport', label: 'Transport', icon: 'transport' },
     { key: 'energy', label: 'Energy', icon: 'energy' },
     { key: 'food', label: 'Food', icon: 'food' },
     { key: 'shopping', label: 'Shopping', icon: 'shopping' },
-  ];
+  ], []);
+
+  if (loading) return <PageLoader />;
+
+  if (!assessment) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4" role="status" aria-label="Loading simulation data">
+        <LoadingSpinner size="xl" label="Loading simulation data..." />
+        <p className="text-slate-400 animate-pulse">Loading simulation data...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen py-10 px-4">
@@ -86,7 +100,7 @@ export default function SimulatorPage() {
               Your Current Footprint
             </p>
             <p className="text-2xl font-bold gradient-text" style={{ fontFamily: 'Syne, sans-serif' }}>
-              {(assessment.totalEmission / 1000).toFixed(2)} tonnes CO₂/year
+              {(assessment.totalEmission / TONNES_DIVISOR).toFixed(2)} tonnes CO₂/year
             </p>
           </div>
           <div className="h-8 w-px hidden sm:block" style={{ background: 'rgba(255,255,255,0.08)' }} aria-hidden="true" />
